@@ -271,9 +271,9 @@ export class AutomationService {
     if (position && position.size !== 0) {
       const closeOrder = {
         symbol: position.symbol,
-        side: position.size > 0 ? 'sell' : 'buy',
+        side: position.size > 0 ? 'sell' as const : 'buy' as const,
         size: Math.abs(position.size),
-        price: undefined, // Market order
+        price: 0, // Market order - will be filled at market price
       };
       
       const result = await this.hyperliquidService.placeOrder(closeOrder);

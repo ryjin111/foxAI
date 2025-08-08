@@ -371,7 +371,7 @@ class HyperliquidMCPServer {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.twitterService.searchTweets(args.query, args.limit), null, 2),
+                  text: JSON.stringify(await this.twitterService.searchTweets(args?.query as string, args?.limit as number), null, 2),
                 },
               ],
             };
@@ -381,7 +381,7 @@ class HyperliquidMCPServer {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.twitterService.getMentions(args.limit), null, 2),
+                  text: JSON.stringify(await this.twitterService.getMentions(args?.limit as number), null, 2),
                 },
               ],
             };
@@ -391,14 +391,14 @@ class HyperliquidMCPServer {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.twitterService.getTrendingTopics(args.woeid), null, 2),
+                  text: JSON.stringify(await this.twitterService.getTrendingTopics(args?.woeid as number), null, 2),
                 },
               ],
             };
 
           // Automation Tools
           case 'add_automation_rule':
-            this.automationService.addRule(args.rule as AutomationRule);
+            this.automationService.addRule(args?.rule as AutomationRule);
             return {
               content: [
                 {
@@ -419,7 +419,7 @@ class HyperliquidMCPServer {
             };
 
           case 'remove_automation_rule':
-            const removed = this.automationService.removeRule(args.ruleId);
+            const removed = this.automationService.removeRule(args?.ruleId as string);
             return {
               content: [
                 {
