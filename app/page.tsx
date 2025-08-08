@@ -64,13 +64,14 @@ export default function AIConsole() {
         if (reader) {
           const decoder = new TextDecoder()
           let aiMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: '' }
+          setMessages(prev => [...prev, aiMessage])
           
           while (true) {
             const { done, value } = await reader.read()
             if (done) break
             
             const chunk = decoder.decode(value)
-            aiMessage.content += chunk
+            aiMessage = { ...aiMessage, content: aiMessage.content + chunk }
             setMessages(prev => [...prev.slice(0, -1), aiMessage])
           }
         }

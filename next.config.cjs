@@ -15,14 +15,7 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/mcp/:path*',
-        destination: '/api/mcp-handler',
-      },
-    ];
-  },
+
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
