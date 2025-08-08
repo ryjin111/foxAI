@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc && next build",
+    "build:nextjs": "next build",
+    "build:mcp": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx src/index.ts",
     "next:dev": "next dev",
