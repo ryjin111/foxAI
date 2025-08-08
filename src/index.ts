@@ -58,11 +58,6 @@ class HyperliquidMCPServer {
       {
         name: 'hyperliquid-mcp',
         version: '1.0.0',
-      },
-      {
-        capabilities: {
-          tools: {},
-        },
       }
     );
 
@@ -297,7 +292,7 @@ class HyperliquidMCPServer {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.hyperliquidService.getMarketData(args.symbol), null, 2),
+                  text: JSON.stringify(await this.hyperliquidService.getMarketData(args?.symbol as string), null, 2),
                 },
               ],
             };
@@ -314,10 +309,10 @@ class HyperliquidMCPServer {
 
           case 'place_order':
             const order = await this.hyperliquidService.placeOrder({
-              symbol: args.symbol,
-              side: args.side,
-              size: args.size,
-              price: args.price,
+              symbol: args?.symbol as string,
+              side: args?.side as 'buy' | 'sell',
+              size: args?.size as number,
+              price: args?.price as number,
             });
             return {
               content: [
@@ -329,7 +324,7 @@ class HyperliquidMCPServer {
             };
 
           case 'cancel_order':
-            const cancelled = await this.hyperliquidService.cancelOrder(args.orderId);
+            const cancelled = await this.hyperliquidService.cancelOrder(args?.orderId as string);
             return {
               content: [
                 {
@@ -344,7 +339,7 @@ class HyperliquidMCPServer {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.hyperliquidService.getOrderHistory(args.limit), null, 2),
+                  text: JSON.stringify(await this.hyperliquidService.getOrderHistory(args?.limit as number), null, 2),
                 },
               ],
             };
@@ -354,14 +349,14 @@ class HyperliquidMCPServer {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.hyperliquidService.generateTradingSignals(args.symbol), null, 2),
+                  text: JSON.stringify(await this.hyperliquidService.generateTradingSignals(args?.symbol as string), null, 2),
                 },
               ],
             };
 
           // Twitter/X Tools
           case 'post_tweet':
-            const tweetId = await this.twitterService.postTweet(args.text);
+            const tweetId = await this.twitterService.postTweet(args?.text as string);
             return {
               content: [
                 {
