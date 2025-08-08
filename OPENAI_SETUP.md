@@ -10,7 +10,7 @@ Create a `.env.local` file in your project root:
 
 ```bash
 # .env.local
-OPENAI_API_KEY=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
+
 ```
 
 ### **2. Install Dependencies**
