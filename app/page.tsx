@@ -1,63 +1,90 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useChat } from 'ai/react'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Activity, 
-  Bot, 
-  Settings, 
-  BarChart3,
-  Wallet,
-  Zap,
-  MessageSquare,
-  AlertCircle,
-  CheckCircle,
-  Clock
-} from 'lucide-react'
+// import { useChat } from 'ai/react'
+// import { 
+//   TrendingUp, 
+//   TrendingDown, 
+//   Activity, 
+//   Bot, 
+//   Settings, 
+//   BarChart3,
+//   Wallet,
+//   Zap,
+//   MessageSquare,
+//   AlertCircle,
+//   CheckCircle,
+//   Clock
+// } from 'lucide-react'
 
-// Mock data for demonstration
-const mockMarketData = [
-  { symbol: 'BTC', price: 43250, change: 2.5, volume: '2.1B', signal: 'bullish' },
-  { symbol: 'ETH', price: 2650, change: -1.2, volume: '1.8B', signal: 'neutral' },
-  { symbol: 'SOL', price: 98.5, change: 5.8, volume: '890M', signal: 'bullish' },
-  { symbol: 'MATIC', price: 0.85, change: -0.5, volume: '320M', signal: 'bearish' },
-]
+// Fallback icon components for build compatibility
+const TrendingUp = ({ className }: { className?: string }) => <span className={className}>📈</span>
+const TrendingDown = ({ className }: { className?: string }) => <span className={className}>📉</span>
+const Activity = ({ className }: { className?: string }) => <span className={className}>📊</span>
+const Bot = ({ className }: { className?: string }) => <span className={className}>🤖</span>
+const Settings = ({ className }: { className?: string }) => <span className={className}>⚙️</span>
+const BarChart3 = ({ className }: { className?: string }) => <span className={className}>📊</span>
+const Wallet = ({ className }: { className?: string }) => <span className={className}>💰</span>
+const Zap = ({ className }: { className?: string }) => <span className={className}>⚡</span>
+const MessageSquare = ({ className }: { className?: string }) => <span className={className}>💬</span>
+const AlertCircle = ({ className }: { className?: string }) => <span className={className}>⚠️</span>
+const CheckCircle = ({ className }: { className?: string }) => <span className={className}>✅</span>
+const Clock = ({ className }: { className?: string }) => <span className={className}>⏰</span>
 
-const mockSignals = [
-  { id: 1, symbol: 'BTC', type: 'buy', confidence: 0.85, timestamp: '2 min ago', price: 43250 },
-  { id: 2, symbol: 'SOL', type: 'buy', confidence: 0.78, timestamp: '5 min ago', price: 98.5 },
-  { id: 3, symbol: 'ETH', type: 'hold', confidence: 0.45, timestamp: '8 min ago', price: 2650 },
-]
 
-const mockAlerts = [
-  { id: 1, type: 'success', message: 'Order executed: BTC buy 0.1 @ $43,250', time: '1 min ago' },
-  { id: 2, type: 'warning', message: 'High volatility detected in SOL', time: '3 min ago' },
-  { id: 3, type: 'info', message: 'Market update posted to Twitter', time: '5 min ago' },
-]
 
 export default function AIConsole() {
   const [activeTab, setActiveTab] = useState('dashboard')
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/chat',
-  })
+  const [input, setInput] = useState('')
+  const [messages, setMessages] = useState<Array<{ id: string; role: string; content: string }>>([])
+  const [isLoading, setIsLoading] = useState(false)
 
-  const getSignalColor = (signal: string) => {
-    switch (signal) {
-      case 'bullish': return 'signal-bullish'
-      case 'bearish': return 'signal-bearish'
-      default: return 'signal-neutral'
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!input.trim()) return
+
+    const userMessage = { id: Date.now().toString(), role: 'user', content: input }
+    setMessages(prev => [...prev, userMessage])
+    setInput('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...messages, userMessage] })
+      })
+
+      if (response.ok) {
+        const reader = response.body?.getReader()
+        if (reader) {
+          const decoder = new TextDecoder()
+          let aiMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: '' }
+          
+          while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+            
+            const chunk = decoder.decode(value)
+            aiMessage.content += chunk
+            setMessages(prev => [...prev.slice(0, -1), aiMessage])
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Chat error:', error)
+      const errorMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }
+      setMessages(prev => [...prev, errorMessage])
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  const getSignalIcon = (signal: string) => {
-    switch (signal) {
-      case 'bullish': return <TrendingUp className="w-4 h-4" />
-      case 'bearish': return <TrendingDown className="w-4 h-4" />
-      default: return <Activity className="w-4 h-4" />
-    }
-  }
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -126,22 +153,9 @@ export default function AIConsole() {
                   <BarChart3 className="w-5 h-5" />
                   <span>Market Overview</span>
                 </h2>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {mockMarketData.map((asset) => (
-                    <div key={asset.symbol} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{asset.symbol}</span>
-                        <span className={`signal-indicator ${getSignalColor(asset.signal)}`}>
-                          {getSignalIcon(asset.signal)}
-                        </span>
-                      </div>
-                      <div className="text-2xl font-bold">${asset.price.toLocaleString()}</div>
-                      <div className={`text-sm ${asset.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                        {asset.change >= 0 ? '+' : ''}{asset.change}%
-                      </div>
-                      <div className="text-xs text-muted-foreground">Vol: {asset.volume}</div>
-                    </div>
-                  ))}
+                <div className="text-center py-12 text-muted-foreground">
+                  <BarChart3 className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <p>Connect your trading APIs to view live market data</p>
                 </div>
               </div>
             </div>
@@ -152,25 +166,9 @@ export default function AIConsole() {
                 <Zap className="w-5 h-5" />
                 <span>AI Signals</span>
               </h2>
-              <div className="space-y-3">
-                {mockSignals.map((signal) => (
-                  <div key={signal.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-3 h-3 rounded-full ${
-                        signal.type === 'buy' ? 'bg-green-500' : 
-                        signal.type === 'sell' ? 'bg-red-500' : 'bg-yellow-500'
-                      }`}></div>
-                      <div>
-                        <div className="font-medium">{signal.symbol}</div>
-                        <div className="text-sm text-muted-foreground">{signal.type.toUpperCase()}</div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">${signal.price.toLocaleString()}</div>
-                      <div className="text-xs text-muted-foreground">{signal.confidence * 100}%</div>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-center py-12 text-muted-foreground">
+                <Zap className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>AI-generated trading signals will appear here</p>
               </div>
             </div>
           </div>
@@ -193,7 +191,7 @@ export default function AIConsole() {
                   </div>
                 )}
                 
-                {messages.map((message) => (
+                {messages.map((message: { id: string; role: string; content: string }) => (
                   <div
                     key={message.id}
                     className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
@@ -244,6 +242,36 @@ export default function AIConsole() {
           </div>
         )}
 
+        {activeTab === 'trading' && (
+          <div className="max-w-4xl mx-auto">
+            <div className="trading-card">
+              <h2 className="text-lg font-semibold mb-4 flex items-center space-x-2">
+                <Activity className="w-5 h-5" />
+                <span>Trading Interface</span>
+              </h2>
+              <div className="text-center py-12 text-muted-foreground">
+                <Activity className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Connect your MCP server to enable trading functionality</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'signals' && (
+          <div className="max-w-4xl mx-auto">
+            <div className="trading-card">
+              <h2 className="text-lg font-semibold mb-4 flex items-center space-x-2">
+                <Zap className="w-5 h-5" />
+                <span>Trading Signals</span>
+              </h2>
+              <div className="text-center py-12 text-muted-foreground">
+                <Zap className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>AI-generated trading signals will appear here</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'alerts' && (
           <div className="max-w-2xl mx-auto">
             <div className="trading-card">
@@ -251,19 +279,9 @@ export default function AIConsole() {
                 <AlertCircle className="w-5 h-5" />
                 <span>System Alerts</span>
               </h2>
-              <div className="space-y-3">
-                {mockAlerts.map((alert) => (
-                  <div key={alert.id} className="flex items-center space-x-3 p-3 bg-muted/50 rounded-lg">
-                    <div className={`w-2 h-2 rounded-full ${
-                      alert.type === 'success' ? 'bg-green-500' :
-                      alert.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
-                    }`}></div>
-                    <div className="flex-1">
-                      <p className="text-sm">{alert.message}</p>
-                      <p className="text-xs text-muted-foreground">{alert.time}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="text-center py-12 text-muted-foreground">
+                <AlertCircle className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>System alerts and notifications will appear here</p>
               </div>
             </div>
           </div>

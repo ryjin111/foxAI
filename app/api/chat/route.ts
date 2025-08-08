@@ -3,7 +3,7 @@ import { Configuration, OpenAIApi } from 'openai-edge'
 
 // Create an OpenAI API client (that's edge friendly!)
 const config = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY || 'demo-key',
+  apiKey: process.env.OPENAI_API_KEY || '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',
 })
 const openai = new OpenAIApi(config)
 
