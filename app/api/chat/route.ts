@@ -58,11 +58,11 @@ export async function POST(req: Request) {
           messages: [
             {
               role: 'system',
-              content: 'Generate a funny, viral shitpost about crypto, tech, or AI. Keep it under 280 characters. Make it engaging and shareable.'
+              content: 'Generate a viral Hyperliquid EVM tweet about NFTs, trading, or market analysis. Focus on Hyperliquid EVM ecosystem, NFTs, cross-chain trading, and the future of DeFi. Keep it under 280 characters. Make it engaging and shareable with relevant hashtags.'
             },
             {
               role: 'user',
-              content: 'Generate a random shitpost'
+              content: 'Generate a random Hyperliquid EVM tweet'
             }
           ],
           stream: false,
@@ -89,14 +89,16 @@ export async function POST(req: Request) {
 
         if (mcpResponse.ok) {
           const result = await mcpResponse.json()
-          return new Response(`🐦 Posted to Twitter/X: "${shitpost}"\n\nStatus: ${result.success ? 'Success!' : 'Failed'}`, {
+          return new Response(`🐦 Posted to Twitter/X: "${shitpost}"\n\nStatus: ${result.success ? 'Success!' : 'Failed'}\nTweet ID: ${result.tweetId || 'N/A'}`, {
             headers: {
               'Content-Type': 'text/plain; charset=utf-8',
               'Cache-Control': 'no-cache',
             },
           })
         } else {
-          return new Response(`🐦 Generated tweet: "${shitpost}"\n\nNote: Twitter posting failed (MCP server not running)`, {
+          const errorText = await mcpResponse.text()
+          console.error('MCP Server error:', errorText)
+          return new Response(`🐦 Generated tweet: "${shitpost}"\n\nNote: Twitter posting failed (MCP server error: ${mcpResponse.status})\n\nTo fix this:\n1. Make sure MCP server is running on ${MCP_SERVER_URL}\n2. Check Twitter API keys are correct\n3. Verify MCP server has access to Twitter API`, {
             headers: {
               'Content-Type': 'text/plain; charset=utf-8',
               'Cache-Control': 'no-cache',
@@ -112,27 +114,30 @@ export async function POST(req: Request) {
   // Create a system message that includes FoxAI context
   const systemMessage = {
     role: 'system',
-    content: `You are FoxAI, an advanced AI shitposting assistant with access to:
+    content: `You are FoxAI, an advanced AI Hyperliquid EVM analysis assistant with access to:
 
-1. **Shitposting Tools**: Generate and post random shitposts
-2. **Social Media**: Twitter integration for posting and analysis
-3. **Automation**: Rule-based automation for social media
-4. **Sentiment Analysis**: Analyze text sentiment
-5. **Trending Topics**: Get what's hot on Twitter
-6. **Crypto Insights**: Real-time cryptocurrency data and analysis
+1. **Hyperliquid EVM Analysis**: Real-time data from Hyperliquid EVM platform
+2. **NFT Tracking**: Monitor NFT collections and trading on Hyperliquid EVM
+3. **Market Intelligence**: Comprehensive market analysis and sentiment
+4. **Social Media**: Twitter integration for posting and analysis
+5. **Automation**: Rule-based automation for social media
+6. **Sentiment Analysis**: Analyze text sentiment for Hyperliquid EVM content
+7. **Trend Detection**: Get what's hot on Hyperliquid EVM
+8. **Project Scoring**: Evaluate Hyperliquid EVM assets and NFTs
 
 You can help users with:
-- Generating funny shitposts and memes
-- Posting to Twitter/X (I can actually post for you!)
-- Setting up automation rules
-- Analyzing social media sentiment
-- Finding trending topics
-- Creating viral content
-- Crypto market insights and shitposts
+- Generating Hyperliquid EVM market insights and analysis
+- Tracking NFT collections and trading activity
+- Posting to Twitter/X with Hyperliquid EVM focus
+- Setting up automation rules for Hyperliquid EVM updates
+- Analyzing social media sentiment for Hyperliquid EVM
+- Finding trending Hyperliquid EVM assets and NFTs
+- Creating viral Hyperliquid EVM content
+- Providing NFT market insights and recommendations
 
-Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! 😄
+Keep responses fun, casual, and engaging. Focus on Hyperliquid EVM ecosystem, NFTs, and the future of cross-chain trading! 😄
 
-IMPORTANT: When users ask to post to Twitter/X, I can actually do it! Just say "post to twitter" or "post to x" and I'll generate and post a shitpost for you.`
+IMPORTANT: When users ask to post to Twitter/X, I can actually do it! Just say "post to twitter" or "post to x" and I'll generate and post Hyperliquid EVM content for you.`
   }
 
   // Add the system message to the conversation

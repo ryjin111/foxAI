@@ -23,7 +23,7 @@ export interface ShitpostTemplate {
   id: string;
   name: string;
   template: string;
-  category: 'meme' | 'copypasta' | 'troll' | 'random' | 'crypto';
+  category: 'meme' | 'copypasta' | 'troll' | 'random' | 'crypto' | 'analysis';
   tags: string[];
 }
 
@@ -58,4 +58,43 @@ export interface TrendingCoin {
     price_btc: number;
     score: number;
   };
+}
+
+// Market Analysis
+export interface MarketAnalysis {
+  timestamp: string;
+  overall_sentiment: 'bullish' | 'bearish' | 'neutral';
+  market_cap_change_24h: number;
+  volume_change_24h: number;
+  top_gainers: CryptoData[];
+  top_losers: CryptoData[];
+  trending_topics: string[];
+  fear_greed_index: number;
+}
+
+// Project Score
+export interface ProjectScore {
+  coin_id: string;
+  name: string;
+  score: number;
+  factors: {
+    market_cap: number;
+    volume: number;
+    price_stability: number;
+    community_growth: number;
+    developer_activity: number;
+  };
+  recommendation: 'buy' | 'hold' | 'sell';
+  risk_level: 'low' | 'medium' | 'high';
+}
+
+// Trend Detection
+export interface TrendDetection {
+  coin_id: string;
+  trend_type: 'breakout' | 'breakdown' | 'consolidation' | 'accumulation';
+  confidence: number;
+  support_level?: number;
+  resistance_level?: number;
+  volume_spike: boolean;
+  timeframe: string;
 } 

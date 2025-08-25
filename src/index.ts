@@ -102,8 +102,7 @@ class FoxAIMCPServer {
               properties: {
                 limit: {
                   type: 'number',
-                  description: 'Number of coins to return',
-                  default: 10,
+                  description: 'Number of coins to return (default: 10)',
                 },
               },
             },
@@ -122,34 +121,61 @@ class FoxAIMCPServer {
             inputSchema: {
               type: 'object',
               properties: {
-                coinId: {
+                coin_id: {
                   type: 'string',
                   description: 'Coin ID (e.g., bitcoin, ethereum)',
                 },
               },
-              required: ['coinId'],
             },
           },
-          // Social Media Tools
+          {
+            name: 'get_market_analysis',
+            description: 'Get comprehensive market analysis with sentiment and trends',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+          {
+            name: 'get_project_score',
+            description: 'Get project score and analysis for a specific coin',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                coin_id: {
+                  type: 'string',
+                  description: 'Coin ID to analyze',
+                },
+              },
+            },
+          },
+          {
+            name: 'detect_trends',
+            description: 'Detect technical trends for a specific coin',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                coin_id: {
+                  type: 'string',
+                  description: 'Coin ID to analyze',
+                },
+              },
+            },
+          },
           {
             name: 'analyze_sentiment',
-            description: 'Analyze sentiment of tweets or text content',
+            description: 'Analyze sentiment of text for crypto keywords',
             inputSchema: {
               type: 'object',
               properties: {
                 text: {
                   type: 'string',
-                  description: 'Text content to analyze',
-                },
-                keywords: {
-                  type: 'array',
-                  items: { type: 'string' },
-                  description: 'Optional keywords to focus on',
+                  description: 'Text to analyze',
                 },
               },
-              required: ['text'],
             },
           },
+          // Social Media Tools
           {
             name: 'post_tweet',
             description: 'Post a tweet to Twitter/X',
@@ -161,7 +187,64 @@ class FoxAIMCPServer {
                   description: 'Tweet content',
                 },
               },
-              required: ['text'],
+            },
+          },
+          {
+            name: 'post_hourly_crypto_update',
+            description: 'Post hourly crypto market update to Twitter',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+          {
+            name: 'post_market_analysis',
+            description: 'Post comprehensive market analysis to Twitter',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+          {
+            name: 'post_project_score',
+            description: 'Post project score analysis for a specific coin to Twitter',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                coin_id: {
+                  type: 'string',
+                  description: 'Coin ID to analyze and post',
+                },
+              },
+            },
+          },
+          {
+            name: 'reply_to_mentions',
+            description: 'Automatically reply to recent Twitter mentions',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+          {
+            name: 'post_trending_analysis',
+            description: 'Post trending crypto analysis to Twitter',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+          {
+            name: 'post_sentiment_analysis',
+            description: 'Post sentiment analysis of text to Twitter',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                text: {
+                  type: 'string',
+                  description: 'Text to analyze and post sentiment for',
+                },
+              },
             },
           },
           {
@@ -251,7 +334,7 @@ class FoxAIMCPServer {
             if (args?.category === 'crypto') {
               shitpost = await this.cryptoService.getRandomCryptoInsight();
             } else {
-              shitpost = this.twitterService.generateShitpost(args?.category as string);
+              shitpost = await this.twitterService.generateShitpost(args?.category as string);
             }
             return {
               content: [
@@ -308,22 +391,52 @@ class FoxAIMCPServer {
             };
 
           case 'get_coin_price':
-            const price = await this.cryptoService.getCoinPrice(args?.coinId as string);
+            const price = await this.cryptoService.getCoinPrice(args?.coin_id as string);
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify({ coinId: args?.coinId, price }, null, 2),
+                  text: JSON.stringify({ coinId: args?.coin_id, price }, null, 2),
+                },
+              ],
+            };
+
+          case 'get_market_analysis':
+            const marketAnalysis = await this.cryptoService.getMarketAnalysis();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(marketAnalysis, null, 2),
+                },
+              ],
+            };
+
+          case 'get_project_score':
+            const projectScore = await this.cryptoService.getProjectScore(args?.coin_id as string);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(projectScore, null, 2),
+                },
+              ],
+            };
+
+          case 'detect_trends':
+            const trendDetection = await this.cryptoService.detectTrends(args?.coin_id as string);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(trendDetection, null, 2),
                 },
               ],
             };
 
           // Social Media Tools
           case 'analyze_sentiment':
-            const sentiment = await this.twitterService.analyzeSentiment(
-              args?.text as string,
-              args?.keywords as string[]
-            );
+            const sentiment = await this.cryptoService.analyzeSentiment(args?.text as string);
             return {
               content: [
                 {
@@ -340,6 +453,72 @@ class FoxAIMCPServer {
                 {
                   type: 'text',
                   text: JSON.stringify(tweet, null, 2),
+                },
+              ],
+            };
+
+          case 'post_hourly_crypto_update':
+            const hourlyUpdate = await this.twitterService.postHourlyCryptoUpdate();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(hourlyUpdate, null, 2),
+                },
+              ],
+            };
+
+          case 'post_market_analysis':
+            const marketPost = await this.twitterService.postMarketAnalysis();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(marketPost, null, 2),
+                },
+              ],
+            };
+
+          case 'post_project_score':
+            const projectPost = await this.twitterService.postProjectScore(args?.coin_id as string);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(projectPost, null, 2),
+                },
+              ],
+            };
+
+          case 'reply_to_mentions':
+            const mentionReplies = await this.twitterService.replyToMentions();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(mentionReplies, null, 2),
+                },
+              ],
+            };
+
+          case 'post_trending_analysis':
+            const trendingPost = await this.twitterService.postTrendingAnalysis();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(trendingPost, null, 2),
+                },
+              ],
+            };
+
+          case 'post_sentiment_analysis':
+            const sentimentPost = await this.twitterService.postSentimentAnalysis(args?.text as string);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(sentimentPost, null, 2),
                 },
               ],
             };
