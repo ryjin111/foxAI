@@ -1,33 +1,33 @@
-# SeishinZ X AI Agent
+# OnChainHyperFoxes AI Agent 🦊
 
-An intelligent AI agent that manages the SeishinZ X (Twitter) account, combining X functionality with real-time Shape Network blockchain data.
+An intelligent AI agent that manages the OnChainHyperFoxes X (Twitter) account, combining X functionality with real-time Hyperliquid EVM blockchain data and NFT collection analytics.
 
 ## 🚀 Features
 
 ### X (Twitter) Account Management
-- **Post tweets** to the SeishinZ X account
-- **Reply to mentions** and engage with followers
-- **Monitor trending topics** and create relevant content
-- **Search and analyze tweets** for insights
-- **Like and retweet** relevant content
+- **Post tweets** about OnChainHyperFoxes NFT collection
+- **Reply to mentions** and engage with the fox community
+- **Monitor trending topics** in the Hyperliquid ecosystem
+- **Search and analyze tweets** for fox-related insights
+- **Like and retweet** relevant Hyperliquid content
 
-### Shape Network Integration
-- **Gasback rewards data** - Share latest reward statistics
-- **NFT collection analytics** - Post about trending collections
-- **Stack achievements** - Highlight user accomplishments
-- **Chain status** - Share network updates and statistics
+### Hyperliquid EVM Integration
+- **OnChainHyperFoxes NFT data** - Share collection statistics and floor prices
+- **Hyperliquid trading analytics** - Post about market trends and volume
+- **EVM ecosystem updates** - Highlight new projects and developments
+- **Fox community achievements** - Celebrate holder milestones and rare mints
 
 ### AI-Powered Features
-- **Intelligent content creation** based on real-time data
-- **Contextual responses** to mentions and comments
-- **Trend analysis** and content recommendations
-- **Brand voice consistency** across all interactions
+- **Intelligent content creation** based on real-time Hyperliquid data
+- **Contextual responses** to fox community mentions and comments
+- **Trend analysis** in the Hyperliquid ecosystem
+- **Fox-themed content** with consistent brand voice
 
 ## 🛠️ Technology Stack
 
 - **Next.js 14** - React framework with App Router
 - **Vercel AI SDK** - AI agent development and streaming
-- **Shape Network MCP** - Blockchain data access
+- **Hyperliquid EVM APIs** - Blockchain data access
 - **Twitter API v2** - X (Twitter) account management
 - **DeepSeek API** - Advanced AI reasoning and content generation
 - **Tailwind CSS** - Modern UI styling
@@ -39,7 +39,7 @@ Before setting up the project, you'll need:
 
 1. **X (Twitter) Developer Account** with API access
 2. **DeepSeek API Key** for AI functionality (advanced reasoning and content generation)
-3. **Shape Network MCP Server** (or use the hosted version)
+3. **Hyperliquid EVM API access** for blockchain data
 4. **Node.js 18+** and npm/yarn
 
 ## 🚀 Quick Start
@@ -48,7 +48,7 @@ Before setting up the project, you'll need:
 
 ```bash
 git clone <your-repo-url>
-cd seishinz-ai-agent
+cd onchainhyperfoxes-ai-agent
 npm install
 ```
 
@@ -67,10 +67,11 @@ TWITTER_ACCESS_TOKEN=your_twitter_access_token_here
 TWITTER_ACCESS_SECRET=your_twitter_access_secret_here
 TWITTER_USER_ID=your_twitter_user_id_here
 
-# Shape Network MCP Server
-SHAPE_MCP_URL=https://shape-mcp-server.vercel.app/mcp
+# Hyperliquid EVM API
+HYPERLIQUID_API_URL=https://api.hyperliquid.xyz
+ONCHAINHYPERFOXES_CONTRACT=your_contract_address_here
 
-# Optional: Alchemy API
+# Optional: Alchemy API for additional EVM data
 ALCHEMY_API_KEY=your_alchemy_api_key_here
 ```
 
@@ -92,33 +93,34 @@ Open [http://localhost:3000](http://localhost:3000) to see the AI agent interfac
 ## 🎯 Usage
 
 ### Chat Interface
-- **Natural language commands** - "Post a tweet about Gasback rewards"
-- **Multi-step actions** - "Check mentions and reply to relevant ones"
-- **Data-driven content** - "Get NFT analytics and create a tweet"
+- **Natural language commands** - "Post a tweet about OnChainHyperFoxes floor price"
+- **Multi-step actions** - "Check mentions and reply to fox community"
+- **Data-driven content** - "Get Hyperliquid analytics and create a fox-themed tweet"
 
 ### Quick Actions
-- **Post GM Tweet** - Post daily GM tweet with seishinz.xyz
-- **Post Gasback Tweet** - Share latest reward statistics
-- **Post NFT Update** - Share trending collections
-- **Auto-Reply to Mentions** - Reply to recent mentions
-- **Check Replies** - View recent mentions and replies
+- **Post Fox GM Tweet** - Post daily GM tweet with fox emoji and Hyperliquid
+- **Post NFT Update** - Share OnChainHyperFoxes collection statistics
+- **Post Market Analysis** - Share Hyperliquid EVM market trends
+- **Auto-Reply to Mentions** - Reply to recent fox community mentions
+- **Check Fox Community** - View recent mentions and replies
 
 ### Admin Controls
 - **Admin Toggle** - Click the "🔓 Enable Admin" button in the sidebar to bypass access code requirements for development
 
 ### Automated Features
 - **🤖 AI Scheduler** - Intelligent automation system that handles all daily tasks
-- **Daily GM Tweets** - Automatically posts GM tweets every day at 9 AM with @ShapeL2 and seishinz.xyz
-- **Weekly Gasback Updates** - Posts Gasback rewards updates every Monday at 10 AM
-- **Daily NFT Updates** - Posts NFT collection analytics daily at 2 PM
-- **Community Engagement** - Automatically replies to mentions every 4 hours
+- **Daily Fox GM Tweets** - Automatically posts GM tweets every day at 9 AM with fox emoji and Hyperliquid
+- **Weekly NFT Updates** - Posts OnChainHyperFoxes collection updates every Monday at 10 AM
+- **Daily Market Analysis** - Posts Hyperliquid EVM market analysis daily at 2 PM
+- **Fox Community Engagement** - Automatically replies to mentions every 4 hours
 
 ## 🔧 API Endpoints
 
 ### `/api/agent`
 Main AI agent endpoint that handles:
 - X account operations (post, reply, like, retweet)
-- Shape Network data queries
+- Hyperliquid EVM data queries
+- OnChainHyperFoxes NFT analytics
 - AI reasoning and content generation
 
 ### `/api/ai-scheduler`
@@ -127,13 +129,13 @@ AI-powered scheduler endpoint that handles:
 - Schedule optimization
 - Task status monitoring
 
-### `/api/cron/gm-tweet`
-Daily GM tweet endpoint for manual triggering
+### `/api/cron/fox-gm-tweet`
+Daily fox GM tweet endpoint for manual triggering
 
 ## 📁 Project Structure
 
 ```
-seishinz-ai-agent/
+onchainhyperfoxes-ai-agent/
 ├── app/
 │   ├── api/agent/route.ts    # Main AI agent API
 │   ├── globals.css           # Global styles
@@ -141,7 +143,7 @@ seishinz-ai-agent/
 │   └── page.tsx              # Main UI component
 ├── lib/
 │   ├── twitter.ts            # Twitter API client
-│   └── shape-mcp.ts          # Shape Network MCP client
+│   └── hyperliquid.ts        # Hyperliquid EVM API client
 ├── package.json
 ├── next.config.js
 ├── tailwind.config.js
@@ -183,7 +185,7 @@ This project is licensed under the MIT License.
 ## 🆘 Support
 
 For questions or issues:
-- Check the [Shape Network AI documentation](https://docs.shape.network/building-on-shape/ai)
+- Check the [Hyperliquid EVM documentation](https://docs.hyperliquid.xyz/)
 - Review Twitter API documentation
 - Open an issue in this repository
 
@@ -191,6 +193,8 @@ For questions or issues:
 
 - **Scheduled posting** - Automate content scheduling
 - **Analytics dashboard** - Track engagement metrics
-- **Multi-language support** - International audience engagement
+- **Multi-language support** - International fox community engagement
 - **Advanced content generation** - More sophisticated AI prompts
-- **Community management** - Automated community engagement 
+- **Fox community management** - Automated community engagement
+- **NFT rarity tracking** - Monitor rare fox traits and sales
+- **Hyperliquid trading signals** - Share market opportunities 

@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'SeishinZ X AI Agent',
-  description: 'AI-powered X (Twitter) account management for SeishinZ',
+  title: 'OnChainHyperFoxes AI Agent',
+  description: 'AI-powered X (Twitter) account management for OnChainHyperFoxes and Hyperliquid EVM ecosystem',
 }
 
 export default function RootLayout({

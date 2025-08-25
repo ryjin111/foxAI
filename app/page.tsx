@@ -13,7 +13,7 @@ interface Message {
   timestamp: Date;
 }
 
-export default function SeishinZAgent() {
+export default function OnChainHyperFoxesAgent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -182,8 +182,8 @@ export default function SeishinZAgent() {
     },
     {
       title: 'Post GM Tweet',
-      description: 'Post daily GM tweet with seishinz.xyz',
-      action: 'Post a GM tweet to @ShapeL2 Shapers with seishinz.xyz website',
+              description: 'Post daily fox GM tweet with Hyperliquid',
+        action: 'Post a GM tweet to @Hyperliquid Foxes with fox emoji and Hyperliquid ecosystem',
       icon: TrendingUp,
       color: 'from-yellow-500 to-orange-600',
     },
@@ -302,7 +302,7 @@ export default function SeishinZAgent() {
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'assistant',
-          content: `✅ **GM Tweet Posted Successfully!**\n\n${result.content}\n\nTweet ID: ${result.tweetId}\nView: https://x.com/seishinzinshape/status/${result.tweetId}`,
+          content: `✅ **Fox GM Tweet Posted Successfully!**\n\n${result.content}\n\nTweet ID: ${result.tweetId}\nView: https://x.com/onchainhyperfoxes/status/${result.tweetId}`,
           timestamp: new Date(),
         }]);
       } else {
@@ -337,7 +337,7 @@ export default function SeishinZAgent() {
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'assistant',
-          content: `🔓 **Access Granted!**\n\n${currentAccess.description}\n\nYou now have access to SeishinZ Agent features!`,
+          content: `🔓 **Access Granted!**\n\n${currentAccess.description}\n\nYou now have access to OnChainHyperFoxes Agent features!`,
           timestamp: new Date(),
         }]);
       }
@@ -441,7 +441,7 @@ export default function SeishinZAgent() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
                 <Twitter className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-lg font-bold text-gray-900">SeishinZ Agent</h1>
+              <h1 className="text-lg font-bold text-gray-900">OnChainHyperFoxes Agent</h1>
             </div>
           </div>
 
@@ -515,7 +515,7 @@ export default function SeishinZAgent() {
                         <Twitter className="w-8 h-8 text-white" />
                       </div>
                       <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                        Welcome to SeishinZ Agent
+                        Welcome to OnChainHyperFoxes Agent
                       </h2>
                       <p className="text-gray-600 max-w-md">
                         Your NFT-focused AI assistant. Ask me to post tweets, check mentions, or get Shape Network data.
@@ -547,7 +547,7 @@ export default function SeishinZAgent() {
                              <div className="flex-1 min-w-0">
                                <div className="flex items-center gap-2 mb-2">
                                  <span className="font-medium text-gray-900">
-                                   {message.role === 'user' ? 'You' : 'SeishinZ Agent'}
+                                   {message.role === 'user' ? 'You' : 'OnChainHyperFoxes Agent'}
                                  </span>
                                  <span className="text-xs text-gray-500">
                                    {formatTime(message.timestamp)}
@@ -587,7 +587,7 @@ export default function SeishinZAgent() {
                              <div className="flex-1">
                                <div className="flex items-center gap-2 mb-2">
                                  <span className="font-medium text-gray-900">
-                                   SeishinZ Agent
+                                   OnChainHyperFoxes Agent
                                  </span>
                                  <span className="text-xs text-gray-500">
                                    {formatTime(new Date())}
@@ -621,7 +621,7 @@ export default function SeishinZAgent() {
                         value={input}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
-                        placeholder="Message SeishinZ Agent..."
+                        placeholder="Message OnChainHyperFoxes Agent..."
                         className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white text-gray-900 placeholder-gray-500"
                         rows={1}
                         disabled={isLoading}

@@ -1,8 +1,8 @@
 import { NextRequest } from 'next/server';
 import { SeishinZTwitterClient } from '@/lib/twitter';
-import { PersonalityEngine, SEISHINZ_PERSONALITY } from '@/lib/ai-personality';
+import { PersonalityEngine, FOX_PERSONALITY } from '@/lib/ai-personality';
 import { DeepSeekClient } from '@/lib/deepseek-client';
-import { SimpleShapeClient } from '@/lib/shape-mcp-simple';
+import { HyperliquidClient } from '@/lib/hyperliquid';
 import { enhancedLearning } from '@/lib/enhanced-learning';
 import { shinZDB } from '@/lib/database';
 import { accessCodeManager } from '@/lib/access-codes';
@@ -11,7 +11,7 @@ export const maxDuration = 30;
 
 // Helper functions for learning system
 function extractTopic(message: string): string {
-  const topics = ['gasback', 'nft', 'shape network', 'crypto', 'blockchain', 'defi', 'rewards'];
+  const topics = ['onchainhyperfoxes', 'fox', 'hyperliquid', 'nft', 'crypto', 'blockchain', 'defi', 'evm'];
   const lowerMessage = message.toLowerCase();
   
   for (const topic of topics) {
@@ -58,8 +58,9 @@ function extractIntent(message: string): string {
 
 function extractNFTMentions(message: string): string[] {
   const nftPatterns = [
-    /seishinz/gi,
-    /shape network/gi,
+    /onchainhyperfoxes/gi,
+    /fox/gi,
+    /hyperliquid/gi,
     /nft/gi,
     /collection/gi,
     /floor/gi,
@@ -156,10 +157,10 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    // Initialize clients
-    const twitterClient = new SeishinZTwitterClient();
-    const shapeClient = new SimpleShapeClient();
-    const personalityEngine = new PersonalityEngine(SEISHINZ_PERSONALITY);
+      // Initialize clients
+  const twitterClient = new SeishinZTwitterClient();
+  const hyperliquidClient = new HyperliquidClient();
+  const personalityEngine = new PersonalityEngine(FOX_PERSONALITY);
     
     // Initialize database and learning system
     await shinZDB.initialize();
@@ -540,25 +541,25 @@ export async function POST(req: NextRequest) {
               toolResults += `\n\n🔗 **I detected a tweet link in your message!**\n\nWant me to reply to this tweet? Just say "reply to this tweet" or "respond to this tweet" and I'll post a reply! 🚀`;
             }
             
-            // Add Shape Network data only when user explicitly requests it with specific phrases
-            if (currentUserMessage.includes('get gasback data') || currentUserMessage.includes('show gasback') || currentUserMessage.includes('gasback stats') || currentUserMessage.includes('gasback information')) {
-              const gasbackData = await shapeClient.getGasbackData();
-              if (gasbackData.success) {
-                additionalData += `\n\n📊 **Gasback Data:**\nTotal Rewards: ${gasbackData.data.totalRewards}\nAverage Reward: ${gasbackData.data.averageReward}\nTotal Users: ${gasbackData.data.totalUsers}`;
+            // Add Hyperliquid EVM data only when user explicitly requests it with specific phrases
+            if (currentUserMessage.includes('get fox data') || currentUserMessage.includes('show fox') || currentUserMessage.includes('fox stats') || currentUserMessage.includes('fox information') || currentUserMessage.includes('onchainhyperfoxes')) {
+              const foxData = await hyperliquidClient.getOnChainHyperFoxesData();
+              if (foxData.success) {
+                additionalData += `\n\n🦊 **OnChainHyperFoxes Data:**\nFloor Price: ${foxData.data.floorPrice}\nVolume 24h: ${foxData.data.volume24h}\nHolders: ${foxData.data.holders}`;
               }
             }
             
-            if (currentUserMessage.includes('get nft data') || currentUserMessage.includes('show nft') || currentUserMessage.includes('nft stats') || currentUserMessage.includes('nft information') || currentUserMessage.includes('collection stats')) {
-              const nftData = await shapeClient.getNFTCollectionAnalytics();
-              if (nftData.success) {
-                additionalData += `\n\n🎨 **NFT Collections:**\nSeishinZ Floor: ${nftData.data.collections[0].floorPrice}\nVolume: ${nftData.data.collections[0].volume}\nHolders: ${nftData.data.collections[0].holders}`;
+            if (currentUserMessage.includes('get market data') || currentUserMessage.includes('show market') || currentUserMessage.includes('market stats') || currentUserMessage.includes('hyperliquid market')) {
+              const marketData = await hyperliquidClient.getMarketAnalytics();
+              if (marketData.success) {
+                additionalData += `\n\n📈 **Hyperliquid Market:**\nVolume 24h: ${marketData.data.volume24h}\nTotal Trades: ${marketData.data.totalTrades}\nActive Users: ${marketData.data.activeUsers}`;
               }
             }
             
-            if (currentUserMessage.includes('stack') || currentUserMessage.includes('achievement') || currentUserMessage.includes('get stack data')) {
-              const stackData = await shapeClient.getStackAchievements();
-              if (stackData.success) {
-                additionalData += `\n\n🏆 **Stack Achievements:**\n${stackData.data.achievements.length} achievements available\nTop user has ${stackData.data.leaderboard[0].points} points`;
+            if (currentUserMessage.includes('ecosystem') || currentUserMessage.includes('projects') || currentUserMessage.includes('get ecosystem data')) {
+              const ecosystemData = await hyperliquidClient.getEcosystemProjects();
+              if (ecosystemData.success) {
+                additionalData += `\n\n🌐 **Hyperliquid Ecosystem:**\n${ecosystemData.data.projects.length} active projects\nLatest: ${ecosystemData.data.developments[0].title}`;
               }
             }
             
