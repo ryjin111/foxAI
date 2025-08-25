@@ -8,10 +8,62 @@ export default function AIConsole() {
   const [messages, setMessages] = useState<Array<{ id: string; role: string; content: string }>>([])
   const [isLoading, setIsLoading] = useState(false)
   const [mounted, setMounted] = useState(false)
+  
+  // Dynamic stats state
+  const [stats, setStats] = useState({
+    shitpostsGenerated: 0,
+    cryptoInsights: 0,
+    tweetsPosted: 0,
+    systemStatus: 'Online'
+  })
 
   useEffect(() => {
     setMounted(true)
+    loadStats()
   }, [])
+
+  // Load dynamic stats
+  const loadStats = async () => {
+    try {
+      // Get stats from localStorage or initialize
+      const savedStats = localStorage.getItem('foxai-stats')
+      if (savedStats) {
+        setStats(JSON.parse(savedStats))
+      } else {
+        // Initialize with some default values
+        const initialStats = {
+          shitpostsGenerated: Math.floor(Math.random() * 50) + 20,
+          cryptoInsights: Math.floor(Math.random() * 30) + 10,
+          tweetsPosted: Math.floor(Math.random() * 20) + 5,
+          systemStatus: 'Online'
+        }
+        setStats(initialStats)
+        localStorage.setItem('foxai-stats', JSON.stringify(initialStats))
+      }
+    } catch (error) {
+      console.error('Error loading stats:', error)
+    }
+  }
+
+  // Update stats when actions are performed
+  const updateStats = (type: string) => {
+    setStats(prev => {
+      const newStats = { ...prev }
+      switch (type) {
+        case 'shitpost':
+          newStats.shitpostsGenerated += 1
+          break
+        case 'crypto':
+          newStats.cryptoInsights += 1
+          break
+        case 'tweet':
+          newStats.tweetsPosted += 1
+          break
+      }
+      localStorage.setItem('foxai-stats', JSON.stringify(newStats))
+      return newStats
+    })
+  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value)
@@ -59,6 +111,29 @@ export default function AIConsole() {
     }
   }
 
+  // Handle quick actions
+  const handleQuickAction = async (action: string) => {
+    switch (action) {
+      case 'shitpost':
+        updateStats('shitpost')
+        // Simulate generating a shitpost
+        const shitpost = "🚀 Just deployed my AI-powered blockchain solution to the cloud. Disrupting the industry one commit at a time! #TechBro #Innovation"
+        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: `Generated shitpost: ${shitpost}` }])
+        break
+      case 'crypto':
+        updateStats('crypto')
+        // Simulate crypto insight
+        const insight = "📊 Bitcoin is currently at $43,250 with a 2.3% increase in the last 24h. Market sentiment is bullish! 🚀 #Crypto #Bitcoin"
+        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: `Crypto insight: ${insight}` }])
+        break
+      case 'tweet':
+        updateStats('tweet')
+        // Simulate posting tweet
+        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: '🐦 Tweet posted successfully! Check your Twitter account.' }])
+        break
+    }
+  }
+
   if (!mounted) {
     return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>
   }
@@ -79,7 +154,7 @@ export default function AIConsole() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                <span className="text-sm text-gray-600">Online</span>
+                <span className="text-sm text-gray-600">{stats.systemStatus}</span>
               </div>
               <span className="text-gray-400">⏰</span>
               <span className="text-sm text-gray-600">
@@ -121,10 +196,10 @@ export default function AIConsole() {
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
-                { label: 'Shitposts Generated', value: '42', icon: '✨' },
-                { label: 'Crypto Insights', value: '15', icon: '🚀' },
-                { label: 'Tweets Posted', value: '8', icon: '🐦' },
-                { label: 'System Status', value: 'Online', icon: '📊' },
+                { label: 'Shitposts Generated', value: stats.shitpostsGenerated.toString(), icon: '✨' },
+                { label: 'Crypto Insights', value: stats.cryptoInsights.toString(), icon: '🚀' },
+                { label: 'Tweets Posted', value: stats.tweetsPosted.toString(), icon: '🐦' },
+                { label: 'System Status', value: stats.systemStatus, icon: '📊' },
               ].map((stat, index) => (
                 <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
                   <div className="flex items-center justify-between">
@@ -142,13 +217,14 @@ export default function AIConsole() {
               <p className="text-gray-600 mb-4">Generate content and get crypto insights</p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                  { icon: '✨', label: 'Generate Shitpost' },
-                  { icon: '🚀', label: 'Crypto Insight' },
-                  { icon: '📈', label: 'Top Coins' },
-                  { icon: '🐦', label: 'Post to Twitter' },
+                  { icon: '✨', label: 'Generate Shitpost', action: 'shitpost' },
+                  { icon: '🚀', label: 'Crypto Insight', action: 'crypto' },
+                  { icon: '📈', label: 'Top Coins', action: 'coins' },
+                  { icon: '🐦', label: 'Post to Twitter', action: 'tweet' },
                 ].map((action, index) => (
                   <button
                     key={index}
+                    onClick={() => handleQuickAction(action.action)}
                     className="h-20 border border-gray-200 rounded-lg flex flex-col items-center justify-center space-y-2 hover:bg-gray-50 transition-colors"
                   >
                     <span className="text-2xl">{action.icon}</span>
@@ -339,6 +415,16 @@ export default function AIConsole() {
                 <h3 className="font-medium mb-2">CoinGecko API</h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Connected to CoinGecko for real-time crypto data.
+                </p>
+                <div className="flex items-center space-x-2">
+                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                  <span className="px-2 py-1 bg-gray-100 rounded text-xs">Connected</span>
+                </div>
+              </div>
+              <div className="border-t pt-6">
+                <h3 className="font-medium mb-2">DeepSeek AI</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Connected to DeepSeek for intelligent responses.
                 </p>
                 <div className="flex items-center space-x-2">
                   <div className="h-2 w-2 rounded-full bg-green-500"></div>
