@@ -8,7 +8,16 @@ interface ActionRequest {
 // Mock ElizaOS actions for Vercel deployment
 export async function POST(request: NextRequest) {
   try {
-    const body: ActionRequest = await request.json();
+    const body = await request.json() as ActionRequest;
+    
+    // Validate required fields
+    if (!body.action) {
+      return NextResponse.json(
+        { error: 'Action is required' },
+        { status: 400 }
+      );
+    }
+    
     const { action, message } = body;
 
     switch (action) {
