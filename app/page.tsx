@@ -45,6 +45,18 @@ export default function AIConsole() {
     }
   }
 
+  // Reset stats (for testing)
+  const resetStats = () => {
+    const newStats = {
+      shitpostsGenerated: 0,
+      cryptoInsights: 0,
+      tweetsPosted: 0,
+      systemStatus: 'Online'
+    }
+    setStats(newStats)
+    localStorage.setItem('foxai-stats', JSON.stringify(newStats))
+  }
+
   // Update stats when actions are performed
   const updateStats = (type: string) => {
     setStats(prev => {
@@ -131,6 +143,11 @@ export default function AIConsole() {
         // Simulate posting tweet
         setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: '🐦 Tweet posted successfully! Check your Twitter account.' }])
         break
+      case 'coins':
+        updateStats('crypto')
+        // Simulate getting top coins
+        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: '📈 Top coins: BTC $43,250, ETH $2,650, SOL $98.50, ADA $0.45' }])
+        break
     }
   }
 
@@ -213,8 +230,18 @@ export default function AIConsole() {
 
             {/* Quick Actions */}
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-              <p className="text-gray-600 mb-4">Generate content and get crypto insights</p>
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold">Quick Actions</h2>
+                  <p className="text-gray-600">Generate content and get crypto insights</p>
+                </div>
+                <button
+                  onClick={resetStats}
+                  className="px-3 py-1 text-xs bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
+                >
+                  Reset Stats
+                </button>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
                   { icon: '✨', label: 'Generate Shitpost', action: 'shitpost' },
