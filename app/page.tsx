@@ -1,396 +1,743 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { Send, Twitter, TrendingUp, MessageCircle, BarChart3, Copy, Check, Bot, User, Sparkles, Zap, Brain, Database, Key, Shield, Crown, Eye } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import PersonalityDisplay from '@/components/PersonalityDisplay';
+import LearningDashboard from '@/components/LearningDashboard';
+import { accessCodeManager } from '@/lib/access-codes';
 
-interface ElizaOSStatus {
-  isActive: boolean;
-  personality: {
-    name: string;
-    traits: string[];
-    goals: string[];
-  };
-  state: {
-    mood: string;
-    energy: number;
-    currentTask?: string;
-    lastAction?: string;
-  };
-  plugins: Array<{
-    id: string;
-    name: string;
-    isEnabled: boolean;
-  }>;
-  workflows: Array<{
-    id: string;
-    name: string;
-    isActive: boolean;
-    lastRun?: string;
-  }>;
-  recentMemories: Array<{
-    id: string;
-    timestamp: string;
-    type: string;
-    content: string;
-  }>;
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
 }
 
-interface MessageResponse {
-  success: boolean;
-  response: string;
-}
+export default function SeishinZAgent() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('chat');
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
+  const [showAccessModal, setShowAccessModal] = useState(false); // Don't show immediately
+  const [accessCode, setAccessCode] = useState('');
+  const [accessError, setAccessError] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-export default function Dashboard() {
-  const [status, setStatus] = useState<ElizaOSStatus | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [message, setMessage] = useState('');
-  const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
-  const [sending, setSending] = useState(false);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   useEffect(() => {
-    fetchStatus();
-    const interval = setInterval(fetchStatus, 5000); // Refresh every 5 seconds
-    return () => clearInterval(interval);
+    scrollToBottom();
+  }, [messages]);
+
+  // Auto-enable admin bypass and start AI scheduler for development
+  useEffect(() => {
+    accessCodeManager.enableAdminBypass();
+    console.log('Auto-enabled admin bypass for development');
+    
+    // Start AI scheduler automatically
+    fetch('/api/ai-scheduler', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ action: 'start' }),
+    }).then(() => {
+      console.log('AI Scheduler started automatically');
+    }).catch((error) => {
+      console.error('Failed to start AI scheduler:', error);
+    });
   }, []);
 
-  const fetchStatus = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: input,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput('');
+    setIsLoading(true);
+
     try {
-      const response = await fetch('/api/elizaos/status');
-      if (response.ok) {
-        const data = await response.json() as ElizaOSStatus;
-        setStatus(data);
+      const response = await fetch('/api/agent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          messages: [...messages, userMessage],
+          accessCode: accessCodeManager.getCurrentAccessCode()?.code || '',
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get response');
       }
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No response body');
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() || '';
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6);
+            if (data === '[DONE]') {
+              setIsLoading(false);
+              return;
+            }
+
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.content) {
+                setMessages(prev => 
+                  prev.map(msg => 
+                    msg.id === assistantMessage.id 
+                      ? { ...msg, content: parsed.content }
+                      : msg
+                  )
+                );
+              }
+            } catch (e) {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+
+      setIsLoading(false);
     } catch (error) {
-      console.error('Failed to fetch status:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error:', error);
+      setMessages(prev => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.',
+          timestamp: new Date(),
+        },
+      ]);
+      setIsLoading(false);
     }
   };
 
-  const startElizaOS = async () => {
-    try {
-      const response = await fetch('/api/elizaos/actions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'start' })
-      });
-      if (response.ok) {
-        await fetchStatus();
-      }
-    } catch (error) {
-      console.error('Failed to start ElizaOS:', error);
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+    // Auto-resize textarea
+    e.target.style.height = 'auto';
+    e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px';
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(e as any);
     }
   };
 
-  const stopElizaOS = async () => {
+  const copyMessage = async (content: string, messageId: string) => {
     try {
-      const response = await fetch('/api/elizaos/actions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'stop' })
-      });
-      if (response.ok) {
-        await fetchStatus();
-      }
-    } catch (error) {
-      console.error('Failed to stop ElizaOS:', error);
+      await navigator.clipboard.writeText(content);
+      setCopiedMessageId(messageId);
+      setTimeout(() => setCopiedMessageId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
     }
   };
 
-  const sendMessage = async () => {
-    if (!message.trim()) return;
+  const quickActions = [
+    {
+      title: '🤖 Start AI Scheduler',
+      description: 'Start automated daily tasks',
+      action: 'Start the AI scheduler for automated daily GM tweets and engagement',
+      icon: TrendingUp,
+      color: 'from-purple-500 to-pink-600',
+    },
+    {
+      title: 'Post GM Tweet',
+      description: 'Post daily GM tweet with seishinz.xyz',
+      action: 'Post a GM tweet to @ShapeL2 Shapers with seishinz.xyz website',
+      icon: TrendingUp,
+      color: 'from-yellow-500 to-orange-600',
+    },
+    {
+      title: 'Post Gasback Tweet',
+      description: 'Post a tweet about Gasback rewards',
+      action: 'Post a tweet about the latest Gasback rewards on Shape Network',
+      icon: TrendingUp,
+      color: 'from-green-500 to-emerald-600',
+    },
+    {
+      title: 'Post NFT Update',
+      description: 'Post about trending NFT collections',
+      action: 'Post a tweet about the latest NFT collection analytics from Shape Network',
+      icon: BarChart3,
+      color: 'from-purple-500 to-indigo-600',
+    },
+    {
+      title: 'Auto-Reply to First 3',
+      description: 'Reply to first 3 people who commented',
+      action: 'Auto reply to first 3 mentions with contextual responses',
+      icon: MessageCircle,
+      color: 'from-blue-500 to-cyan-600',
+    },
+    {
+      title: 'Auto-Reply to First 5',
+      description: 'Reply to first 5 people who commented',
+      action: 'Auto reply to first 5 mentions with contextual responses',
+      icon: MessageCircle,
+      color: 'from-indigo-500 to-purple-600',
+    },
+    {
+      title: 'Check Replies',
+      description: 'Check recent replies and mentions',
+      action: 'Check replies to see recent mentions and replies to your tweets',
+      icon: MessageCircle,
+      color: 'from-teal-500 to-cyan-600',
+    },
+  ];
+
+  const handleQuickAction = (action: string) => {
+    // Check if user has permission to use quick actions
+    if (!accessCodeManager.canPerformAction('useQuickActions')) {
+      // Auto-enable admin bypass for development
+      accessCodeManager.enableAdminBypass();
+      console.log('Auto-enabled admin bypass for quick action');
+    }
     
-    setSending(true);
-    const userMessage = message;
-    setMessage('');
+    // Special handling for AI Scheduler
+    if (action.includes('AI scheduler')) {
+      handleAiScheduler();
+      return;
+    }
     
-    // Add user message to chat
-    setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
+    // Special handling for GM tweet
+    if (action.includes('GM tweet')) {
+      handleGmTweet();
+      return;
+    }
     
+    setInput(action);
+    setActiveTab('chat');
+    setTimeout(() => inputRef.current?.focus(), 100);
+  };
+
+  const handleAiScheduler = async () => {
     try {
-      const response = await fetch('/api/elizaos/actions', {
+      const response = await fetch('/api/ai-scheduler', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'message', message: userMessage })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ action: 'start' }),
       });
+
+      const result = await response.json();
       
-      if (response.ok) {
-        const data = await response.json() as MessageResponse;
-        setChatHistory(prev => [...prev, { role: 'assistant', content: data.response }]);
+      if (result.success) {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `🤖 **AI Scheduler Started!**\n\n✅ Automated tasks are now running:\n\n• Daily GM tweets at 9 AM\n• Weekly Gasback updates on Mondays\n• Daily NFT collection updates at 2 PM\n• Community engagement every 4 hours\n\nThe AI will now handle all your daily posting automatically! 🚀`,
+          timestamp: new Date(),
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `❌ **Failed to start AI scheduler:** ${result.error}`,
+          timestamp: new Date(),
+        }]);
       }
     } catch (error) {
-      console.error('Failed to send message:', error);
-      setChatHistory(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
-    } finally {
-      setSending(false);
+      console.error('Error starting AI scheduler:', error);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '❌ **Error starting AI scheduler:** Please try again.',
+        timestamp: new Date(),
+      }]);
     }
   };
 
-  if (loading) {
+  const handleGmTweet = async () => {
+    try {
+      const response = await fetch('/api/cron/gm-tweet', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const result = await response.json();
+      
+      if (result.success) {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `✅ **GM Tweet Posted Successfully!**\n\n${result.content}\n\nTweet ID: ${result.tweetId}\nView: https://x.com/seishinzinshape/status/${result.tweetId}`,
+          timestamp: new Date(),
+        }]);
+      } else {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `❌ **Failed to post GM tweet:** ${result.error}`,
+          timestamp: new Date(),
+        }]);
+      }
+    } catch (error) {
+      console.error('Error posting GM tweet:', error);
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        role: 'assistant',
+        content: '❌ **Error posting GM tweet:** Please try again.',
+        timestamp: new Date(),
+      }]);
+    }
+  };
+
+  const handleAccessCodeSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAccessError('');
+    
+    if (accessCodeManager.setAccessCode(accessCode)) {
+      setShowAccessModal(false);
+      setAccessCode('');
+      // Add success message to chat
+      const currentAccess = accessCodeManager.getCurrentAccessCode();
+      if (currentAccess) {
+        setMessages(prev => [...prev, {
+          id: Date.now().toString(),
+          role: 'assistant',
+          content: `🔓 **Access Granted!**\n\n${currentAccess.description}\n\nYou now have access to SeishinZ Agent features!`,
+          timestamp: new Date(),
+        }]);
+      }
+    } else {
+      setAccessError('Invalid access code. Please try again.');
+    }
+  };
+
+  const getAccessStatus = () => {
+    const currentAccess = accessCodeManager.getCurrentAccessCode();
+    const usageStats = accessCodeManager.getUsageStats();
+    
+    // Check for admin bypass first
+    if (accessCodeManager.isAdminBypassEnabled()) {
+      return { status: 'Admin Bypass', color: 'text-purple-500', icon: Crown };
+    }
+    
+    if (!currentAccess) {
+      return { status: 'No Access', color: 'text-red-500', icon: Shield };
+    }
+    
+    switch (currentAccess.type) {
+      case 'nft_holder':
+        return { status: 'NFT Holder', color: 'text-green-500', icon: Crown };
+      case 'admin':
+        return { status: 'Admin', color: 'text-purple-500', icon: Crown };
+      case 'viewer':
+        return { status: 'Viewer', color: 'text-blue-500', icon: Eye };
+      case 'restricted':
+        return { status: 'Guest', color: 'text-yellow-500', icon: Shield };
+      default:
+        return { status: 'Unknown', color: 'text-gray-500', icon: Shield };
+    }
+  };
+
+  const AccessStatusDisplay = ({ onShowModal }: { onShowModal: () => void }) => {
+    const accessStatus = getAccessStatus();
+    const usageStats = accessCodeManager.getUsageStats();
+    const StatusIcon = accessStatus.icon;
+    
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-fox-500"></div>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2">
+          <StatusIcon className={`w-4 h-4 ${accessStatus.color}`} />
+          <span className={`text-sm font-medium ${accessStatus.color}`}>
+            {accessStatus.status}
+          </span>
+        </div>
+        {usageStats.accessCode !== 'None' && (
+          <div className="text-xs text-gray-500 space-y-1">
+            <div>Tweets: {usageStats.tweetsPosted}/{usageStats.accessCode === 'ADMIN2024' ? '∞' : usageStats.remainingTweets + usageStats.tweetsPosted}</div>
+            <div>Replies: {usageStats.repliesSent}/{usageStats.accessCode === 'ADMIN2024' ? '∞' : usageStats.remainingReplies + usageStats.repliesSent}</div>
+          </div>
+        )}
+        {usageStats.accessCode === 'None' && (
+          <button
+            onClick={onShowModal}
+            className="w-full text-xs text-blue-600 hover:text-blue-800 transition-colors"
+          >
+            Enter Access Code
+          </button>
+        )}
+        
+        {/* Admin Bypass Toggle */}
+        <div className="pt-2 border-t border-gray-200">
+          <button
+            onClick={() => {
+              if (accessCodeManager.isAdminBypassEnabled()) {
+                accessCodeManager.disableAdminBypass();
+              } else {
+                accessCodeManager.enableAdminBypass();
+              }
+              // Force re-render
+              setMessages(prev => [...prev]);
+            }}
+            className={`w-full text-xs px-2 py-1 rounded transition-colors ${
+              accessCodeManager.isAdminBypassEnabled()
+                ? 'bg-red-100 text-red-700 hover:bg-red-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}
+          >
+            {accessCodeManager.isAdminBypassEnabled() ? '🔒 Disable Admin' : '🔓 Enable Admin'}
+          </button>
+        </div>
       </div>
     );
-  }
+  };
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <h1 className="text-2xl font-bold text-gradient">🦊 FoxAI ElizaOS</h1>
+      <div className="flex h-screen">
+        {/* Sidebar */}
+        <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
+          {/* Logo */}
+          <div className="p-4 border-b border-gray-200">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
+                <Twitter className="w-4 h-4 text-white" />
               </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className={`w-3 h-3 rounded-full ${status?.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
-                <span className="text-sm text-gray-600">
-                  {status?.isActive ? 'Active' : 'Inactive'}
-                </span>
-              </div>
+              <h1 className="text-lg font-bold text-gray-900">SeishinZ Agent</h1>
             </div>
           </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 p-4 space-y-2">
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'chat'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <MessageCircle className="w-4 h-4" />
+              Chat
+            </button>
+            <button
+              onClick={() => setActiveTab('quick')}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'quick'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Zap className="w-4 h-4" />
+              Quick Actions
+            </button>
+            <button
+              onClick={() => setActiveTab('personality')}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'personality'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Sparkles className="w-4 h-4" />
+              Personality
+            </button>
+            <button
+              onClick={() => setActiveTab('learning')}
+              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                activeTab === 'learning'
+                  ? 'bg-blue-50 text-blue-600'
+                  : 'text-gray-600 hover:bg-gray-100'
+              }`}
+            >
+              <Brain className="w-4 h-4" />
+              Learning
+            </button>
+          </nav>
+
+          {/* Access Status */}
+          <div className="p-4 border-t border-gray-200">
+            <AccessStatusDisplay 
+              onShowModal={() => setShowAccessModal(true)}
+            />
+          </div>
         </div>
-      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Control Panel */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Status Card */}
-            <div className="card">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Agent Status</h2>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={startElizaOS}
-                    disabled={status?.isActive}
-                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    <span>Start</span>
-                  </button>
-                  <button
-                    onClick={stopElizaOS}
-                    disabled={!status?.isActive}
-                    className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
-                    </svg>
-                    <span>Stop</span>
-                  </button>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">Current State</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Mood:</span>
-                      <span className="font-medium capitalize">{status?.state.mood}</span>
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col">
+          {activeTab === 'chat' ? (
+            /* Chat Interface */
+            <>
+              {/* Messages */}
+              <div className="flex-1 overflow-y-auto bg-white">
+                {messages.length === 0 ? (
+                  <div className="flex items-center justify-center h-full">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Twitter className="w-8 h-8 text-white" />
+                      </div>
+                      <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                        Welcome to SeishinZ Agent
+                      </h2>
+                      <p className="text-gray-600 max-w-md">
+                        Your NFT-focused AI assistant. Ask me to post tweets, check mentions, or get Shape Network data.
+                      </p>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Energy:</span>
-                      <span className="font-medium">{status?.state.energy}%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Current Task:</span>
-                      <span className="font-medium">{status?.state.currentTask || 'None'}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h3 className="font-medium text-gray-900 mb-2">Personality</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Name:</span>
-                      <span className="font-medium">{status?.personality.name}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Traits:</span>
-                      <span className="font-medium">{status?.personality.traits.length}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Goals:</span>
-                      <span className="font-medium">{status?.personality.goals.length}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Chat Interface */}
-            <div className="card">
-              <div className="flex items-center space-x-2 mb-4">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                </svg>
-                <h2 className="text-xl font-semibold text-gray-900">Chat with ElizaOS</h2>
-              </div>
-              
-              <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
-                {chatHistory.length === 0 ? (
-                  <div className="text-center text-gray-500 py-8">
-                    <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    <p>Start a conversation with ElizaOS</p>
                   </div>
                 ) : (
-                  <div className="space-y-3">
-                    {chatHistory.map((msg, index) => (
-                      <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                          msg.role === 'user' 
-                            ? 'bg-fox-500 text-white' 
-                            : 'bg-white text-gray-900 border border-gray-200'
-                        }`}>
-                          <p className="text-sm">{msg.content}</p>
-                        </div>
-                      </div>
-                    ))}
-                    {sending && (
-                      <div className="flex justify-start">
-                        <div className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-lg">
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                  <div className="max-w-4xl mx-auto">
+                                         {messages.map((message) => (
+                       <div
+                         key={message.id}
+                         className={`py-6 border-b border-gray-100 ${
+                           message.role === 'assistant' ? 'bg-gray-50' : ''
+                         }`}
+                       >
+                         <div className="max-w-3xl mx-auto px-4">
+                           <div className="flex gap-4">
+                             <div className="flex-shrink-0">
+                               {message.role === 'user' ? (
+                                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                                   <User className="w-4 h-4 text-white" />
+                                 </div>
+                               ) : (
+                                 <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
+                                   <Bot className="w-4 h-4 text-white" />
+                                 </div>
+                               )}
+                             </div>
+                             <div className="flex-1 min-w-0">
+                               <div className="flex items-center gap-2 mb-2">
+                                 <span className="font-medium text-gray-900">
+                                   {message.role === 'user' ? 'You' : 'SeishinZ Agent'}
+                                 </span>
+                                 <span className="text-xs text-gray-500">
+                                   {formatTime(message.timestamp)}
+                                 </span>
+                                 {message.role === 'assistant' && (
+                                   <button
+                                     onClick={() => copyMessage(message.content, message.id)}
+                                     className="ml-auto p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                   >
+                                     {copiedMessageId === message.id ? (
+                                       <Check className="w-4 h-4 text-green-500" />
+                                     ) : (
+                                       <Copy className="w-4 h-4" />
+                                     )}
+                                   </button>
+                                 )}
+                               </div>
+                               <div className="prose prose-sm max-w-none">
+                                 <div className="whitespace-pre-wrap text-gray-900">
+                                   {message.content}
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                     ))}
+                                         {isLoading && (
+                       <div className="py-6 border-b border-gray-100 bg-gray-50">
+                         <div className="max-w-3xl mx-auto px-4">
+                           <div className="flex gap-4">
+                             <div className="flex-shrink-0">
+                               <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
+                                 <Bot className="w-4 h-4 text-white" />
+                               </div>
+                             </div>
+                             <div className="flex-1">
+                               <div className="flex items-center gap-2 mb-2">
+                                 <span className="font-medium text-gray-900">
+                                   SeishinZ Agent
+                                 </span>
+                                 <span className="text-xs text-gray-500">
+                                   {formatTime(new Date())}
+                                 </span>
+                               </div>
+                               <div className="flex items-center gap-2 text-gray-600">
+                                 <div className="flex space-x-1">
+                                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                 </div>
+                                 <span className="text-sm">Thinking...</span>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       </div>
+                     )}
+                    <div ref={messagesEndRef} />
                   </div>
                 )}
               </div>
-              
-              <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
-                  onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Type your message..."
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fox-500 focus:border-transparent"
-                  disabled={sending}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!message.trim() || sending}
-                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Plugins Status */}
-            <div className="card">
-              <div className="flex items-center space-x-2 mb-4">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                <h2 className="text-lg font-semibold text-gray-900">Plugins</h2>
-              </div>
-              <div className="space-y-3">
-                {status?.plugins.map((plugin) => (
-                  <div key={plugin.id} className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">{plugin.name}</span>
-                    <span className={plugin.isEnabled ? 'status-active' : 'status-inactive'}>
-                      {plugin.isEnabled ? 'Active' : 'Inactive'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Workflows */}
-            <div className="card">
-              <div className="flex items-center space-x-2 mb-4">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <h2 className="text-lg font-semibold text-gray-900">Workflows</h2>
-              </div>
-              <div className="space-y-3">
-                {status?.workflows.map((workflow) => (
-                  <div key={workflow.id} className="border-b border-gray-100 pb-2 last:border-b-0">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-gray-900">{workflow.name}</span>
-                      <span className={workflow.isActive ? 'status-active' : 'status-inactive'}>
-                        {workflow.isActive ? 'Active' : 'Inactive'}
-                      </span>
+              {/* Input */}
+              <div className="border-t border-gray-200 bg-white p-4">
+                <div className="max-w-4xl mx-auto">
+                  <form onSubmit={handleSubmit} className="relative">
+                    <div className="relative">
+                      <textarea
+                        ref={inputRef}
+                        value={input}
+                        onChange={handleInputChange}
+                        onKeyDown={handleKeyDown}
+                        placeholder="Message SeishinZ Agent..."
+                        className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white text-gray-900 placeholder-gray-500"
+                        rows={1}
+                        disabled={isLoading}
+                      />
+                      <button
+                        type="submit"
+                        disabled={isLoading || !input.trim()}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                      >
+                        <Send className="w-4 h-4" />
+                      </button>
                     </div>
-                    {workflow.lastRun && (
-                      <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span>Last run: {new Date(workflow.lastRun).toLocaleString()}</span>
-                      </div>
-                    )}
-                  </div>
-                ))}
+                    <div className="mt-2 text-xs text-gray-500">
+                      Press Enter to send, Shift+Enter for new line
+                    </div>
+                  </form>
+                </div>
               </div>
-            </div>
-
-            {/* Recent Memories */}
-            <div className="card">
-              <div className="flex items-center space-x-2 mb-4">
-                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM4 5h6V4a1 1 0 00-1-1H5a1 1 0 00-1 1v1zM4 11h6v-2H4v2zM14 5h6V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v1zM14 11h6v-2h-6v2zM14 17h6v-2h-6v2z" />
-                </svg>
-                <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-              </div>
-              <div className="space-y-3">
-                {status?.recentMemories.slice(0, 5).map((memory) => (
-                  <div key={memory.id} className="border-b border-gray-100 pb-2 last:border-b-0">
-                    <div className="flex items-start space-x-2">
-                      <div className="flex-shrink-0 mt-1">
-                        {memory.type === 'conversation' && (
-                          <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                          </svg>
-                        )}
-                        {memory.type === 'action' && (
-                          <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        )}
-                        {memory.type === 'system' && (
-                          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-gray-900 truncate">{memory.content}</p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(memory.timestamp).toLocaleString()}
-                        </p>
+            </>
+          ) : activeTab === 'quick' ? (
+            /* Quick Actions */
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+              <div className="max-w-4xl mx-auto">
+                <div className="mb-6">
+                  <h1 className="text-2xl font-bold text-gray-900 mb-2">Quick Actions</h1>
+                  <p className="text-gray-600">
+                    Execute common tasks with one click
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {quickActions.map((action, index) => (
+                    <div
+                      key={index}
+                      className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer group"
+                      onClick={() => handleQuickAction(action.action)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className={`w-12 h-12 bg-gradient-to-r ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <action.icon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 mb-2">{action.title}</h3>
+                          <p className="text-sm text-gray-600 mb-4">{action.description}</p>
+                          <div className="text-xs text-blue-600 font-medium">
+                            Click to execute →
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
+          ) : activeTab === 'personality' ? (
+            /* Personality Display */
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+              <div className="max-w-4xl mx-auto">
+                <PersonalityDisplay />
+              </div>
+            </div>
+          ) : (
+            /* Learning Dashboard */
+            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
+              <div className="max-w-6xl mx-auto">
+                <LearningDashboard />
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Access Code Modal */}
+      {showAccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+            <div className="flex items-center gap-3 mb-4">
+              <Key className="w-6 h-6 text-blue-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Access Required</h2>
+            </div>
+            
+            <form onSubmit={handleAccessCodeSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Access Code
+                </label>
+                <input
+                  type="text"
+                  value={accessCode}
+                  onChange={(e) => setAccessCode(e.target.value)}
+                  placeholder="Enter access code..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
+                  autoFocus
+                />
+              </div>
+              
+              {accessError && (
+                <div className="text-red-600 text-sm">{accessError}</div>
+              )}
+              
+              <div className="text-xs text-gray-900 space-y-1">
+                <div><strong>Contact me @clintmod111 for access codes.</strong></div>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  type="submit"
+                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Enter Code
+                </button>
+               
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

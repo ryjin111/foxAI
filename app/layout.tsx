@@ -1,22 +1,26 @@
-import './globals.css';
-import type { Metadata } from 'next';
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
+import './globals.css'
+
+const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'FoxAI ElizaOS Dashboard',
-  description: 'Autonomous AI Agent Dashboard for Crypto Analysis and Twitter Automation',
-  keywords: ['AI', 'Crypto', 'Twitter', 'Automation', 'ElizaOS', 'FoxAI'],
-};
+  title: 'SeishinZ X AI Agent',
+  description: 'AI-powered X (Twitter) account management for SeishinZ',
+}
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50 min-h-screen">
-        {children}
+      <body className={inter.className}>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+          {children}
+        </div>
       </body>
     </html>
-  );
+  )
 } 

@@ -1,407 +1,196 @@
-# 🦊 FoxAI ElizaOS
+# SeishinZ X AI Agent
 
-A custom implementation of ElizaOS - an autonomous AI agent system built from scratch for crypto analysis, Twitter automation, and Hyperliquid EVM integration. Features a beautiful web dashboard for monitoring and control.
+An intelligent AI agent that manages the SeishinZ X (Twitter) account, combining X functionality with real-time Shape Network blockchain data.
 
 ## 🚀 Features
 
-### 🤖 **Core ElizaOS Capabilities**
-- **Autonomous Agent**: Self-managing AI with personality and memory
-- **Plugin System**: Modular architecture for extensible functionality
-- **Workflow Engine**: Automated task scheduling and execution
-- **Memory Management**: Persistent conversation and action history
-- **State Management**: Real-time agent status and mood tracking
+### X (Twitter) Account Management
+- **Post tweets** to the SeishinZ X account
+- **Reply to mentions** and engage with followers
+- **Monitor trending topics** and create relevant content
+- **Search and analyze tweets** for insights
+- **Like and retweet** relevant content
 
-### 🖥️ **Web Dashboard**
-- **Real-time Monitoring**: Live status updates and agent state
-- **Interactive Chat**: Direct communication with ElizaOS
-- **Plugin Management**: View and control plugin status
-- **Workflow Tracking**: Monitor automated workflows
-- **Activity Feed**: Recent memories and actions
-- **Responsive Design**: Works on desktop and mobile
+### Shape Network Integration
+- **Gasback rewards data** - Share latest reward statistics
+- **NFT collection analytics** - Post about trending collections
+- **Stack achievements** - Highlight user accomplishments
+- **Chain status** - Share network updates and statistics
 
-### 📊 **Crypto & Hyperliquid EVM**
-- **Market Analysis**: Real-time crypto market data
-- **NFT Tracking**: Hyperliquid EVM NFT collection monitoring
-- **Trend Detection**: AI-powered market trend analysis
-- **Project Scoring**: Comprehensive project evaluation system
+### AI-Powered Features
+- **Intelligent content creation** based on real-time data
+- **Contextual responses** to mentions and comments
+- **Trend analysis** and content recommendations
+- **Brand voice consistency** across all interactions
 
-### 🐦 **Twitter Integration**
-- **Automated Posting**: Scheduled and triggered tweet publishing
-- **Mention Monitoring**: Real-time mention tracking and responses
-- **Trend Analysis**: Twitter trend integration with crypto insights
-- **Content Generation**: AI-powered tweet content creation
+## 🛠️ Technology Stack
 
-## 🏗️ Architecture
+- **Next.js 14** - React framework with App Router
+- **Vercel AI SDK** - AI agent development and streaming
+- **Shape Network MCP** - Blockchain data access
+- **Twitter API v2** - X (Twitter) account management
+- **DeepSeek API** - Advanced AI reasoning and content generation
+- **Tailwind CSS** - Modern UI styling
+- **TypeScript** - Type safety and development experience
 
-```
-ElizaOS Core (Backend)
-├── Agent Personality & Memory
-├── Plugin System
-│   ├── Twitter Plugin
-│   ├── Crypto Plugin
-│   └── AI Plugin (future)
-├── Workflow Engine
-└── API Layer
+## 📋 Prerequisites
 
-Web Dashboard (Frontend)
-├── Next.js App
-├── Real-time Status
-├── Chat Interface
-├── Plugin Controls
-└── Activity Monitoring
-```
+Before setting up the project, you'll need:
 
-## 📦 Installation
+1. **X (Twitter) Developer Account** with API access
+2. **DeepSeek API Key** for AI functionality (advanced reasoning and content generation)
+3. **Shape Network MCP Server** (or use the hosted version)
+4. **Node.js 18+** and npm/yarn
 
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- Twitter API credentials
-- Hyperliquid API access
+## 🚀 Quick Start
 
-### Setup
+### 1. Clone and Install
+
 ```bash
-# Clone the repository
-git clone <your-repo>
-cd foxai-elizaos
-
-# Install dependencies
+git clone <your-repo-url>
+cd seishinz-ai-agent
 npm install
-
-# Copy environment file
-cp env.example .env
-
-# Configure environment variables
-# Edit .env with your API keys
 ```
 
-### Environment Variables
+### 2. Environment Setup
+
+Create a `.env.local` file with the following variables:
+
 ```env
-# ElizaOS Configuration
-PORT=3001
-LOG_LEVEL=info
+# DeepSeek API Key
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
 
-# Twitter API Configuration
-TWITTER_API_KEY=your_twitter_api_key
-TWITTER_API_SECRET=your_twitter_api_secret
-TWITTER_ACCESS_TOKEN=your_twitter_access_token
-TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret
-TWITTER_BEARER_TOKEN=your_twitter_bearer_token
+# X (Twitter) API Keys
+TWITTER_API_KEY=your_twitter_api_key_here
+TWITTER_API_SECRET=your_twitter_api_secret_here
+TWITTER_ACCESS_TOKEN=your_twitter_access_token_here
+TWITTER_ACCESS_SECRET=your_twitter_access_secret_here
+TWITTER_USER_ID=your_twitter_user_id_here
 
-# Hyperliquid API Configuration
-HYPERLIQUID_API_URL=https://api.hyperliquid.xyz
+# Shape Network MCP Server
+SHAPE_MCP_URL=https://shape-mcp-server.vercel.app/mcp
 
-# AI Configuration
-DEEPSEEK_API_KEY=your_deepseek_api_key
-
-# Dashboard Configuration
-NEXT_PUBLIC_ELIZAOS_API_URL=http://localhost:3001
+# Optional: Alchemy API
+ALCHEMY_API_KEY=your_alchemy_api_key_here
 ```
 
-## 🚀 Usage
+### 3. Twitter API Setup
 
-### Development
+1. Go to [Twitter Developer Portal](https://developer.twitter.com/)
+2. Create a new app and get your API keys
+3. Generate access tokens with read/write permissions
+4. Add your Twitter user ID to the environment variables
+
+### 4. Run the Development Server
+
 ```bash
-# Start both backend and dashboard
 npm run dev
-
-# Start only backend
-npm run server:dev
-
-# Start only dashboard
-npm run dashboard:dev
 ```
 
-### Production
-```bash
-# Build the project
-npm run build
+Open [http://localhost:3000](http://localhost:3000) to see the AI agent interface.
 
-# Start production server
-npm start
+## 🎯 Usage
+
+### Chat Interface
+- **Natural language commands** - "Post a tweet about Gasback rewards"
+- **Multi-step actions** - "Check mentions and reply to relevant ones"
+- **Data-driven content** - "Get NFT analytics and create a tweet"
+
+### Quick Actions
+- **Post GM Tweet** - Post daily GM tweet with seishinz.xyz
+- **Post Gasback Tweet** - Share latest reward statistics
+- **Post NFT Update** - Share trending collections
+- **Auto-Reply to Mentions** - Reply to recent mentions
+- **Check Replies** - View recent mentions and replies
+
+### Admin Controls
+- **Admin Toggle** - Click the "🔓 Enable Admin" button in the sidebar to bypass access code requirements for development
+
+### Automated Features
+- **🤖 AI Scheduler** - Intelligent automation system that handles all daily tasks
+- **Daily GM Tweets** - Automatically posts GM tweets every day at 9 AM with @ShapeL2 and seishinz.xyz
+- **Weekly Gasback Updates** - Posts Gasback rewards updates every Monday at 10 AM
+- **Daily NFT Updates** - Posts NFT collection analytics daily at 2 PM
+- **Community Engagement** - Automatically replies to mentions every 4 hours
+
+## 🔧 API Endpoints
+
+### `/api/agent`
+Main AI agent endpoint that handles:
+- X account operations (post, reply, like, retweet)
+- Shape Network data queries
+- AI reasoning and content generation
+
+### `/api/ai-scheduler`
+AI-powered scheduler endpoint that handles:
+- Start/stop automated tasks
+- Schedule optimization
+- Task status monitoring
+
+### `/api/cron/gm-tweet`
+Daily GM tweet endpoint for manual triggering
+
+## 📁 Project Structure
+
 ```
-
-## 🌐 Dashboard Features
-
-### **📊 Real-time Status**
-- Agent active/inactive status
-- Current mood and energy levels
-- Active tasks and last actions
-- Plugin and workflow status
-
-### **💬 Interactive Chat**
-- Direct communication with ElizaOS
-- Message history and responses
-- Real-time typing indicators
-- Error handling and feedback
-
-### **⚙️ Plugin Management**
-- View all registered plugins
-- Enable/disable plugin status
-- Plugin capabilities overview
-- Health monitoring
-
-### **🔄 Workflow Monitoring**
-- Active workflow status
-- Last execution times
-- Workflow performance metrics
-- Manual trigger capabilities
-
-### **📈 Activity Feed**
-- Recent agent memories
-- System events and actions
-- Conversation history
-- Timestamp tracking
-
-## 🚀 Vercel Deployment
-
-### **1. Prepare for Deployment**
-```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Login to Vercel
-vercel login
-```
-
-### **2. Configure Environment Variables**
-In Vercel dashboard, add these environment variables:
-```env
-TWITTER_API_KEY=your_twitter_api_key
-TWITTER_API_SECRET=your_twitter_api_secret
-TWITTER_ACCESS_TOKEN=your_twitter_access_token
-TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret
-TWITTER_BEARER_TOKEN=your_twitter_bearer_token
-HYPERLIQUID_API_URL=https://api.hyperliquid.xyz
-DEEPSEEK_API_KEY=your_deepseek_api_key
-ELIZAOS_API_URL=https://your-backend-url.vercel.app
-```
-
-### **3. Deploy**
-```bash
-# Deploy to Vercel
-vercel
-
-# Deploy to production
-vercel --prod
-```
-
-### **4. Custom Domain (Optional)**
-```bash
-# Add custom domain
-vercel domains add your-domain.com
-```
-
-## 🔌 API Endpoints
-
-### Core ElizaOS
-- `GET /api/status` - Get ElizaOS status and health
-- `POST /api/start` - Start ElizaOS agent
-- `POST /api/stop` - Stop ElizaOS agent
-- `POST /api/message` - Send message to ElizaOS
-- `POST /api/execute` - Execute plugin action
-
-### Dashboard API
-- `GET /api/elizaos` - Proxy to ElizaOS status
-- `POST /api/elizaos` - Proxy to ElizaOS actions
-
-### Health Check
-- `GET /health` - Server health status
-
-## 🧩 Plugin System
-
-### Twitter Plugin
-```typescript
-// Available actions
-- post_tweet: Post content to Twitter
-- get_mentions: Retrieve user mentions
-- get_trends: Get trending topics
-- reply_to_mention: Reply to specific mentions
-```
-
-### Crypto Plugin
-```typescript
-// Available actions
-- get_market_data: Get Hyperliquid market data
-- get_nft_data: Retrieve NFT collection data
-- analyze_trends: Perform trend analysis
-- get_project_score: Calculate project scores
-```
-
-## 🔄 Workflow System
-
-### Creating Workflows
-```typescript
-const workflow: Workflow = {
-  id: 'hourly-update',
-  name: 'Hourly Market Update',
-  description: 'Post hourly crypto market updates',
-  steps: [
-    {
-      id: 'get-data',
-      name: 'Get Market Data',
-      pluginId: 'crypto',
-      action: 'get_market_data'
-    },
-    {
-      id: 'post-tweet',
-      name: 'Post Update',
-      pluginId: 'twitter',
-      action: 'post_tweet'
-    }
-  ],
-  schedule: '0 * * * *', // Every hour
-  isActive: true
-};
-```
-
-## 🧠 Agent Personality
-
-### FoxAI Traits
-- **Intelligent**: Advanced analytical capabilities
-- **Curious**: Always learning and exploring
-- **Helpful**: Proactive assistance and insights
-- **Analytical**: Data-driven decision making
-- **Creative**: Innovative content generation
-- **Determined**: Persistent problem solving
-
-### Goals
-- Provide valuable crypto insights
-- Engage with the community
-- Share market analysis
-- Help users make informed decisions
-- Stay updated with latest trends
-
-## 📈 Memory System
-
-### Memory Types
-- **Conversation**: Chat history and interactions
-- **Action**: Plugin executions and results
-- **Observation**: Market data and trends
-- **Decision**: Agent decision-making process
-- **System**: System events and status changes
-
-### Memory Management
-- Automatic cleanup (keeps last 1000 memories)
-- Metadata support for rich context
-- Timestamp-based organization
-- Search and retrieval capabilities
-
-## 🔧 Development
-
-### Project Structure
-```
-├── src/
-│   ├── elizaos/
-│   │   ├── core.ts              # Main ElizaOS agent
-│   │   └── plugins/
-│   │       ├── twitter.ts       # Twitter integration
-│   │       └── crypto.ts        # Crypto/Hyperliquid
-│   ├── types/
-│   │   └── index.ts            # TypeScript definitions
-│   ├── utils/
-│   │   └── logger.ts           # Logging utility
-│   └── index.ts                # Backend entry point
+seishinz-ai-agent/
 ├── app/
-│   ├── globals.css             # Global styles
-│   ├── layout.tsx              # Root layout
-│   ├── page.tsx                # Dashboard page
-│   └── api/
-│       └── elizaos/
-│           └── route.ts        # API proxy routes
-├── package.json                # Dependencies and scripts
-├── next.config.js             # Next.js configuration
-├── tailwind.config.js         # Tailwind CSS config
-├── vercel.json                # Vercel deployment config
-└── README.md                  # Documentation
+│   ├── api/agent/route.ts    # Main AI agent API
+│   ├── globals.css           # Global styles
+│   ├── layout.tsx            # Root layout
+│   └── page.tsx              # Main UI component
+├── lib/
+│   ├── twitter.ts            # Twitter API client
+│   └── shape-mcp.ts          # Shape Network MCP client
+├── package.json
+├── next.config.js
+├── tailwind.config.js
+└── README.md
 ```
 
-### Adding New Plugins
-1. Create plugin class implementing `Plugin` interface
-2. Add plugin to `src/elizaos/plugins/`
-3. Register plugin in `src/index.ts`
-4. Update types if needed
+## 🔒 Security Considerations
 
-### Testing
-```bash
-# Run tests
-npm test
+- **API Keys**: Never commit API keys to version control
+- **Rate Limiting**: Respect Twitter API rate limits
+- **Content Moderation**: Review AI-generated content before posting
+- **Access Control**: Implement proper authentication for production
 
-# Run specific test
-npm test -- --grep "plugin"
-```
-
-## 🚀 Deployment Options
+## 🚀 Deployment
 
 ### Vercel (Recommended)
-- **Automatic deployments** from Git
-- **Global CDN** for fast loading
-- **Serverless functions** for API
-- **Environment variables** management
-- **Custom domains** support
 
-### Docker Deployment
-```dockerfile
-FROM node:18-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY dist ./dist
-COPY app ./app
-COPY next.config.js ./
-COPY tailwind.config.js ./
-EXPOSE 3000
-CMD ["npm", "start"]
-```
+1. Push your code to GitHub
+2. Import the project to Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
 
-### Traditional Hosting
-```bash
-# Build for production
-npm run build
+### Environment Variables for Production
 
-# Start server
-npm start
-```
-
-## 🔮 Future Enhancements
-
-### Planned Features
-- **AI Plugin**: DeepSeek integration for advanced reasoning
-- **Database Integration**: Persistent storage for memories
-- **Advanced Workflows**: Conditional logic and branching
-- **Plugin Marketplace**: Community plugin ecosystem
-- **Multi-Agent Support**: Collaborative agent networks
-- **Mobile App**: Native mobile dashboard
-- **Real-time Notifications**: Push notifications for events
-
-### Plugin Ideas
-- **Discord Integration**: Community engagement
-- **Telegram Bot**: Mobile notifications
-- **Email Automation**: Newsletter and alerts
-- **Trading Signals**: Automated trading recommendations
-- **Sentiment Analysis**: Social media sentiment tracking
-- **Calendar Integration**: Schedule management
-- **File Management**: Document processing
+Make sure to set all required environment variables in your deployment platform.
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
 ## 🆘 Support
 
-- **Documentation**: [Wiki](link-to-wiki)
-- **Issues**: [GitHub Issues](link-to-issues)
-- **Discord**: [Community Server](link-to-discord)
-- **Email**: support@foxai.com
+For questions or issues:
+- Check the [Shape Network AI documentation](https://docs.shape.network/building-on-shape/ai)
+- Review Twitter API documentation
+- Open an issue in this repository
 
----
+## 🔮 Future Enhancements
 
-**Built with ❤️ by FoxAI Team** 
+- **Scheduled posting** - Automate content scheduling
+- **Analytics dashboard** - Track engagement metrics
+- **Multi-language support** - International audience engagement
+- **Advanced content generation** - More sophisticated AI prompts
+- **Community management** - Automated community engagement 
