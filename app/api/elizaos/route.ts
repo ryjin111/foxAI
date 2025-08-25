@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface ElizaOSRequest {
+  action: string;
+  message?: string;
+  pluginId?: string;
+  params?: any;
+}
+
 const ELIZAOS_API_URL = process.env.ELIZAOS_API_URL || 'http://localhost:3001';
 
 export async function GET(request: NextRequest) {
@@ -17,7 +24,16 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body = await request.json() as ElizaOSRequest;
+    
+    // Validate required fields
+    if (!body.action) {
+      return NextResponse.json(
+        { error: 'Action is required' },
+        { status: 400 }
+      );
+    }
+    
     const { action, ...params } = body;
 
     let endpoint = '';
