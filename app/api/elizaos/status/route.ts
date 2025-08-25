@@ -1,11 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface ElizaOSStatus {
+  isActive: boolean;
+  personality: {
+    name: string;
+    traits: string[];
+    goals: string[];
+  };
+  state: {
+    mood: string;
+    energy: number;
+    currentTask?: string;
+    lastAction?: string;
+  };
+  plugins: Array<{
+    id: string;
+    name: string;
+    isEnabled: boolean;
+  }>;
+  workflows: Array<{
+    id: string;
+    name: string;
+    isActive: boolean;
+    lastRun?: string;
+  }>;
+  recentMemories: Array<{
+    id: string;
+    timestamp: string;
+    type: string;
+    content: string;
+  }>;
+}
+
 // Mock ElizaOS status for Vercel deployment
 // In a real implementation, this would connect to your ElizaOS backend
 export async function GET(request: NextRequest) {
   try {
     // Simulate ElizaOS status
-    const status = {
+    const status: ElizaOSStatus = {
       isActive: true,
       personality: {
         name: "FoxAI",

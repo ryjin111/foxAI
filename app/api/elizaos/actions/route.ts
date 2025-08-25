@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+interface ActionRequest {
+  action: string;
+  message?: string;
+}
+
 // Mock ElizaOS actions for Vercel deployment
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    const body: ActionRequest = await request.json();
     const { action, message } = body;
 
     switch (action) {
