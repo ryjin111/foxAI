@@ -1,8 +1,15 @@
-# 🦊 FoxAI - Advanced Crypto Analysis & AI Shitposting Platform
+# 🦊 FoxAI - Advanced Crypto Analysis & Autonomous AI Agent
 
-**AI-powered crypto analysis, market intelligence, and automated social media management with real-time insights and trend detection.**
+**AI-powered crypto analysis, market intelligence, and autonomous social media management with real-time insights, trend detection, and 24/7 autonomous operation powered by ElizaOS.**
 
 ## 🚀 Features
+
+### **🤖 Autonomous AI Agent (ElizaOS)**
+- **24/7 Autonomous Operation** - Runs continuously without human intervention
+- **Persistent Memory** - Learns from interactions and market patterns
+- **Multi-step Workflows** - Complex operations through natural language
+- **Plugin Architecture** - 90+ official plugins for unlimited capabilities
+- **Real-world Actions** - Takes actions in the real world through plugins
 
 ### **Core Capabilities**
 - 🤖 **AI-Powered Analysis** - DeepSeek AI integration for intelligent insights
@@ -51,6 +58,11 @@ TWITTER_ACCESS_TOKEN=your_twitter_access_token
 TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret
 TWITTER_BEARER_TOKEN=your_twitter_bearer_token
 
+# ElizaOS Agent
+ELIZAOS_API_KEY=your_elizaos_api_key
+HYPERLIQUID_API_URL=https://api.hyperliquid.xyz
+COINGECKO_API_KEY=your_coingecko_api_key
+
 # MCP Server
 MCP_SERVER_URL=http://localhost:3001
 ```
@@ -64,8 +76,55 @@ npm install
 # Start MCP server
 npm run dev
 
+# Start ElizaOS agent
+npm run eliza:dev
+
 # Start Next.js app
 npm run next:dev
+```
+
+## 🤖 ElizaOS Autonomous Agent
+
+### **Agent Personality**
+FoxAI is an autonomous AI agent specialized in Hyperliquid EVM analysis and NFT market intelligence with:
+- **Hyperliquid EVM expertise** - Deep knowledge of NFT trading and DeFi protocols
+- **Playful personality** - Makes complex crypto concepts accessible
+- **Bullish on Hyperliquid EVM** - Always optimistic about cross-chain trading
+- **Community engagement** - Loves sharing insights and building community
+
+### **Autonomous Workflows**
+
+#### **1. Hourly Market Updates**
+- **Schedule:** Every hour at the top of the hour
+- **Actions:** Fetch data → Analyze sentiment → Generate content → Post to Twitter
+- **Output:** Engaging Hyperliquid EVM market updates
+
+#### **2. Mention Monitoring**
+- **Schedule:** Every 5 minutes
+- **Actions:** Check mentions → Analyze sentiment → Generate replies → Reply to mentions
+- **Output:** Smart, context-aware responses
+
+#### **3. NFT Collection Monitoring**
+- **Schedule:** Every 15 minutes
+- **Actions:** Fetch NFT data → Analyze performance → Identify opportunities
+- **Output:** Real-time NFT insights and trading opportunities
+
+### **Agent Commands**
+```bash
+# Start autonomous agent
+npm run eliza:dev
+
+# Send message to agent
+curl -X POST /api/eliza \
+  -H "Content-Type: application/json" \
+  -d '{"action": "send_message", "message": "Analyze current Hyperliquid EVM market"}'
+
+# Get agent status
+curl -X GET /api/eliza
+
+# Start/stop agent
+curl -X POST /api/eliza -d '{"action": "start"}'
+curl -X POST /api/eliza -d '{"action": "stop"}'
 ```
 
 ## 🧠 MCP Server Tools
@@ -149,6 +208,8 @@ npm run next:dev
 - **CoinGecko API** - Real-time crypto data and market information
 - **Twitter API v2** - Social media posting and analysis
 - **DeepSeek AI** - Advanced AI analysis and content generation
+- **ElizaOS Framework** - Autonomous AI agent capabilities
+- **Hyperliquid API** - NFT and DeFi protocol data
 
 ## 🚀 Advanced Features
 
@@ -190,6 +251,12 @@ npm run next:dev
 - Market sentiment analysis
 - Investment recommendations
 
+### **For Autonomous Operation**
+- 24/7 market monitoring
+- Automated social media management
+- Intelligent mention replies
+- Continuous market intelligence
+
 ## 🤝 Contributing
 
 1. Fork the repository
@@ -203,4 +270,6 @@ MIT License - see LICENSE file for details
 
 ---
 
-**🦊 FoxAI - Your AI-powered crypto analysis and shitposting companion!** 🚀 
+**🦊 FoxAI - Your autonomous AI-powered crypto analysis and Hyperliquid EVM specialist!** 🚀
+
+*Powered by ElizaOS - The most popular AI agentic framework* 

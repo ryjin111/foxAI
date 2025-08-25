@@ -1,7 +1,7 @@
 {
   "name": "foxai",
   "version": "1.0.0",
-  "description": "AI-powered shitposting with MCP server and modern console",
+  "description": "AI-powered Hyperliquid EVM analysis with autonomous agent capabilities",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -13,20 +13,33 @@
     "next:dev": "next dev",
     "next:build": "next build",
     "next:start": "next start",
-    "test": "jest"
+    "test": "jest",
+    "eliza:dev": "tsx src/eliza-agent.ts",
+    "eliza:start": "node dist/eliza-agent.js"
   },
   "keywords": [
     "ai",
-    "shitposting",
-    "mcp",
+    "hyperliquid",
+    "evm",
+    "nft",
+    "autonomous-agent",
+    "elizaos",
     "twitter",
     "automation",
     "nextjs",
-    "ai-sdk"
+    "ai-sdk",
+    "defi",
+    "crypto"
   ],
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@elizaos/core": "^1.0.0",
+    "@elizaos/plugins": "^1.0.0",
+    "@elizaos/twitter": "^1.0.0",
+    "@elizaos/blockchain": "^1.0.0",
+    "@elizaos/defi": "^1.0.0",
+    "@elizaos/ai": "^1.0.0",
     "@modelcontextprotocol/sdk": "^0.4.0",
     "ai": "^3.0.0",
     "openai-edge": "^1.2.2",
