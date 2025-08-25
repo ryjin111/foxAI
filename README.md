@@ -10,6 +10,7 @@ An AI-powered shitposting and crypto insights assistant with MCP (Model Context 
 - ⚡ **Automation**: Rule-based social media and crypto automation
 - 📊 **CoinGecko Integration**: Live cryptocurrency data
 - 🎯 **Sentiment Analysis**: Analyze text sentiment
+- 🧠 **DeepSeek AI**: Powered by DeepSeek for intelligent responses
 
 ## Quick Deploy to Vercel
 
@@ -25,7 +26,7 @@ TWITTER_API_SECRET=your_twitter_api_secret
 TWITTER_ACCESS_TOKEN=your_twitter_access_token
 TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret
 TWITTER_BEARER_TOKEN=your_twitter_bearer_token
-OPENAI_API_KEY=your_openai_api_key
+DEEPSEEK_API_KEY=your_deepseek_api_key
 ```
 
 ### 3. Deploy
@@ -98,7 +99,7 @@ npm run next:dev
 
 - **CoinGecko API**: For cryptocurrency data (no API key required)
 - **Twitter API**: For posting tweets and sentiment analysis
-- **OpenAI API**: For AI chat functionality
+- **DeepSeek API**: For AI chat functionality
 
 ## License
 
