@@ -3,6 +3,14 @@ import { TwitterConfig, SentimentResult, ShitpostTemplate } from '../types/index
 import { Logger } from '../utils/logger.js';
 import { CryptoService, MarketAnalysis, ProjectScore } from './crypto.js';
 
+export interface TwitterPostResult {
+  success: boolean;
+  tweetId?: string;
+  text?: string;
+  error?: string;
+  details?: any;
+}
+
 export class TwitterService {
   private client: TwitterApi;
   private logger: Logger;
@@ -46,7 +54,7 @@ export class TwitterService {
     {
       id: '6',
       name: 'Crypto Moon',
-      template: '🚀 {coin} is mooning! {percentage}% gains in 24h! To the moon! 🌙 #Crypto #MoonMission',
+      template: '🚀 {asset} on Hyperliquid EVM just went {direction}! {percentage}% in 24h! The NFT market is wild! 🌙 #Hyperliquid #EVM #NFT',
       category: 'crypto',
       tags: ['crypto', 'moon', 'gains']
     },
@@ -77,18 +85,40 @@ export class TwitterService {
     this.cryptoService = new CryptoService();
   }
 
-  async postTweet(text: string): Promise<any> {
+  async postTweet(text: string): Promise<TwitterPostResult> {
     try {
-      const tweet = await this.client.v2.tweet(text);
-      this.logger.info(`Tweet posted: ${tweet.data.id}`);
-      return { success: true, tweetId: tweet.data.id, text };
+      // Sanitize content: clean whitespace, remove excessive emojis, ensure proper length
+      let sanitizedText = this.sanitizeTweetContent(text);
+      
+      this.logger.info(`Attempting to post tweet: ${sanitizedText.substring(0, 50)}...`);
+      this.logger.info(`Twitter client initialized: ${!!this.client}`);
+      
+      const tweet = await this.client.v2.tweet(sanitizedText);
+      this.logger.info(`Tweet posted successfully: ${tweet.data.id}`);
+      
+      return { 
+        success: true, 
+        tweetId: tweet.data.id, 
+        text: tweet.data.text 
+      };
     } catch (error) {
-      this.logger.error('Failed to post tweet:', error);
-      throw error;
+      this.logger.error('Error posting tweet:', error);
+      this.logger.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: (error as any)?.code,
+        status: (error as any)?.status,
+        data: (error as any)?.data
+      });
+      
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        details: (error as any)?.data || error
+      };
     }
   }
 
-  async postHourlyCryptoUpdate(): Promise<any> {
+  async postHourlyCryptoUpdate(): Promise<TwitterPostResult> {
     try {
       const marketAnalysis = await this.cryptoService.getMarketAnalysis();
       const topGainer = marketAnalysis.top_gainers[0];
@@ -103,11 +133,14 @@ export class TwitterService {
       return await this.postTweet(tweet);
     } catch (error) {
       this.logger.error('Failed to post hourly Hyperliquid update:', error);
-      throw error;
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   }
 
-  async postMarketAnalysis(): Promise<any> {
+  async postMarketAnalysis(): Promise<TwitterPostResult> {
     try {
       const analysis = await this.cryptoService.getMarketAnalysis();
       
@@ -122,11 +155,14 @@ export class TwitterService {
       return await this.postTweet(tweet);
     } catch (error) {
       this.logger.error('Failed to post Hyperliquid market analysis:', error);
-      throw error;
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   }
 
-  async postProjectScore(coinId: string): Promise<any> {
+  async postProjectScore(coinId: string): Promise<TwitterPostResult> {
     try {
       const score = await this.cryptoService.getProjectScore(coinId);
       
@@ -142,11 +178,14 @@ export class TwitterService {
       return await this.postTweet(tweet);
     } catch (error) {
       this.logger.error('Failed to post Hyperliquid project score:', error);
-      throw error;
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   }
 
-  async replyToMentions(): Promise<any[]> {
+  async replyToMentions(): Promise<TwitterPostResult[]> {
     try {
       // Get mentions from the last hour
       const mentions = await this.client.v2.userMentionTimeline('me', {
@@ -155,7 +194,7 @@ export class TwitterService {
         'max_results': 10
       });
 
-      const replies = [];
+      const replies: TwitterPostResult[] = [];
       
       // Handle paginated results properly
       if (mentions && mentions.data && Array.isArray(mentions.data) && mentions.data.length > 0) {
@@ -163,25 +202,64 @@ export class TwitterService {
           try {
             const reply = await this.generateMentionReply(mention.text);
             if (reply) {
-              const tweetReply = await this.client.v2.reply(reply, mention.id);
+              const tweetReply = await this.replyToTweet(mention.id, reply);
               replies.push({
-                originalTweetId: mention.id,
-                replyId: tweetReply.data.id,
-                reply: reply
+                success: tweetReply.success,
+                tweetId: tweetReply.tweetId,
+                text: reply,
+                error: tweetReply.error,
+                details: tweetReply.details
               });
             }
           } catch (mentionError) {
             this.logger.error(`Failed to process mention ${mention.id}:`, mentionError);
-            // Continue with other mentions
+            replies.push({
+              success: false,
+              error: mentionError instanceof Error ? mentionError.message : 'Unknown error'
+            });
           }
         }
       }
 
-      this.logger.info(`Replied to ${replies.length} mentions`);
+      this.logger.info(`Replied to ${replies.filter(r => r.success).length} mentions`);
       return replies;
     } catch (error) {
       this.logger.error('Failed to reply to mentions:', error);
-      throw error;
+      return [{
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }];
+    }
+  }
+
+  async replyToTweet(tweetId: string, content: string): Promise<TwitterPostResult> {
+    try {
+      this.logger.info(`Attempting to reply to tweet: ${tweetId}`);
+      this.logger.info(`Reply content: ${content.substring(0, 50)}...`);
+      
+      const sanitizedContent = this.sanitizeTweetContent(content);
+      const reply = await this.client.v2.reply(sanitizedContent, tweetId);
+      
+      this.logger.info(`Reply posted successfully: ${reply.data.id}`);
+      return { 
+        success: true, 
+        tweetId: reply.data.id, 
+        text: reply.data.text 
+      };
+    } catch (error) {
+      this.logger.error('Error replying to tweet:', error);
+      this.logger.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: (error as any)?.code,
+        status: (error as any)?.status,
+        data: (error as any)?.data
+      });
+      
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        details: (error as any)?.data || error
+      };
     }
   }
 
@@ -206,7 +284,7 @@ export class TwitterService {
     }
   }
 
-  async postTrendingAnalysis(): Promise<any> {
+  async postTrendingAnalysis(): Promise<TwitterPostResult> {
     try {
       const trendingCoins = await this.cryptoService.getTrendingCoins();
       const topCoins = await this.cryptoService.getTopCoins(5);
@@ -225,11 +303,14 @@ export class TwitterService {
       return await this.postTweet(tweet);
     } catch (error) {
       this.logger.error('Failed to post Hyperliquid trending analysis:', error);
-      throw error;
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   }
 
-  async postSentimentAnalysis(text: string): Promise<any> {
+  async postSentimentAnalysis(text: string): Promise<TwitterPostResult> {
     try {
       const sentiment = await this.cryptoService.analyzeSentiment(text);
       
@@ -243,7 +324,10 @@ export class TwitterService {
       return await this.postTweet(tweet);
     } catch (error) {
       this.logger.error('Failed to post Hyperliquid sentiment analysis:', error);
-      throw error;
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   }
 
@@ -312,13 +396,16 @@ export class TwitterService {
     return template.template;
   }
 
-  async postRandomShitpost(): Promise<any> {
+  async postRandomShitpost(): Promise<TwitterPostResult> {
     try {
       const shitpost = await this.generateShitpost();
       return await this.postTweet(shitpost);
     } catch (error) {
       this.logger.error('Failed to post random shitpost:', error);
-      throw error;
+      return { 
+        success: false, 
+        error: error instanceof Error ? error.message : 'Unknown error' 
+      };
     }
   }
 
@@ -351,5 +438,16 @@ export class TwitterService {
       this.logger.error('Failed to get tweet analytics:', error);
       return null;
     }
+  }
+
+  // Helper method to sanitize tweet content
+  private sanitizeTweetContent(text: string): string {
+    return text
+      .replace(/\*\*/g, '') // Remove markdown bold
+      .replace(/#\w+/g, '') // Remove hashtags (we'll add them back properly)
+      .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters (emojis)
+      .replace(/\s+/g, ' ') // Normalize whitespace
+      .trim()
+      .substring(0, 280); // Ensure we don't exceed Twitter's limit
   }
 } 

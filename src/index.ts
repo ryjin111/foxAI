@@ -463,7 +463,13 @@ class FoxAIMCPServer {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(hourlyUpdate, null, 2),
+                  text: JSON.stringify({
+                    success: hourlyUpdate.success,
+                    message: hourlyUpdate.success ? 'Hyperliquid EVM update posted successfully' : 'Failed to post update',
+                    tweetId: hourlyUpdate.tweetId,
+                    content: hourlyUpdate.text,
+                    error: hourlyUpdate.error
+                  }, null, 2),
                 },
               ],
             };
