@@ -1,31 +1,16 @@
 {
   "version": 2,
-  "builds": [
+  "buildCommand": "npm run build:dashboard",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "rewrites": [
     {
-      "src": "src/index.ts",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "package.json",
-      "use": "@vercel/next"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/src/index.ts"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
+      "source": "/api/elizaos/(.*)",
+      "destination": "/api/elizaos"
     }
   ],
   "env": {
     "ELIZAOS_API_URL": "@elizaos-api-url"
-  },
-  "functions": {
-    "src/index.ts": {
-      "maxDuration": 30
-    }
   }
 } 

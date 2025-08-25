@@ -1,17 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  PlayIcon, 
-  StopIcon, 
-  ChatBubbleLeftRightIcon,
-  CogIcon,
-  ChartBarIcon,
-  BellIcon,
-  CheckCircleIcon,
-  XCircleIcon,
-  ClockIcon
-} from '@heroicons/react/24/outline';
 
 interface ElizaOSStatus {
   isActive: boolean;
@@ -52,8 +41,6 @@ export default function Dashboard() {
   const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
   const [sending, setSending] = useState(false);
 
-  const apiUrl = process.env.NEXT_PUBLIC_ELIZAOS_API_URL || 'http://localhost:3001';
-
   useEffect(() => {
     fetchStatus();
     const interval = setInterval(fetchStatus, 5000); // Refresh every 5 seconds
@@ -62,7 +49,7 @@ export default function Dashboard() {
 
   const fetchStatus = async () => {
     try {
-      const response = await fetch(`${apiUrl}/api/status`);
+      const response = await fetch('/api/elizaos/status');
       if (response.ok) {
         const data = await response.json();
         setStatus(data);
@@ -76,7 +63,11 @@ export default function Dashboard() {
 
   const startElizaOS = async () => {
     try {
-      const response = await fetch(`${apiUrl}/api/start`, { method: 'POST' });
+      const response = await fetch('/api/elizaos/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'start' })
+      });
       if (response.ok) {
         await fetchStatus();
       }
@@ -87,7 +78,11 @@ export default function Dashboard() {
 
   const stopElizaOS = async () => {
     try {
-      const response = await fetch(`${apiUrl}/api/stop`, { method: 'POST' });
+      const response = await fetch('/api/elizaos/actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'stop' })
+      });
       if (response.ok) {
         await fetchStatus();
       }
@@ -107,10 +102,10 @@ export default function Dashboard() {
     setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
     
     try {
-      const response = await fetch(`${apiUrl}/api/message`, {
+      const response = await fetch('/api/elizaos/actions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMessage })
+        body: JSON.stringify({ action: 'message', message: userMessage })
       });
       
       if (response.ok) {
@@ -170,7 +165,9 @@ export default function Dashboard() {
                     disabled={status?.isActive}
                     className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
-                    <PlayIcon className="w-4 h-4" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
                     <span>Start</span>
                   </button>
                   <button
@@ -178,7 +175,10 @@ export default function Dashboard() {
                     disabled={!status?.isActive}
                     className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
-                    <StopIcon className="w-4 h-4" />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                    </svg>
                     <span>Stop</span>
                   </button>
                 </div>
@@ -226,14 +226,18 @@ export default function Dashboard() {
             {/* Chat Interface */}
             <div className="card">
               <div className="flex items-center space-x-2 mb-4">
-                <ChatBubbleLeftRightIcon className="w-5 h-5 text-gray-600" />
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                </svg>
                 <h2 className="text-xl font-semibold text-gray-900">Chat with ElizaOS</h2>
               </div>
               
               <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
                 {chatHistory.length === 0 ? (
                   <div className="text-center text-gray-500 py-8">
-                    <ChatBubbleLeftRightIcon className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                    <svg className="w-12 h-12 mx-auto mb-2 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
                     <p>Start a conversation with ElizaOS</p>
                   </div>
                 ) : (
@@ -290,7 +294,10 @@ export default function Dashboard() {
             {/* Plugins Status */}
             <div className="card">
               <div className="flex items-center space-x-2 mb-4">
-                <CogIcon className="w-5 h-5 text-gray-600" />
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
                 <h2 className="text-lg font-semibold text-gray-900">Plugins</h2>
               </div>
               <div className="space-y-3">
@@ -308,7 +315,9 @@ export default function Dashboard() {
             {/* Workflows */}
             <div className="card">
               <div className="flex items-center space-x-2 mb-4">
-                <ChartBarIcon className="w-5 h-5 text-gray-600" />
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
                 <h2 className="text-lg font-semibold text-gray-900">Workflows</h2>
               </div>
               <div className="space-y-3">
@@ -322,7 +331,9 @@ export default function Dashboard() {
                     </div>
                     {workflow.lastRun && (
                       <div className="flex items-center space-x-1 text-xs text-gray-500">
-                        <ClockIcon className="w-3 h-3" />
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                         <span>Last run: {new Date(workflow.lastRun).toLocaleString()}</span>
                       </div>
                     )}
@@ -334,7 +345,9 @@ export default function Dashboard() {
             {/* Recent Memories */}
             <div className="card">
               <div className="flex items-center space-x-2 mb-4">
-                <BellIcon className="w-5 h-5 text-gray-600" />
+                <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM4 5h6V4a1 1 0 00-1-1H5a1 1 0 00-1 1v1zM4 11h6v-2H4v2zM14 5h6V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v1zM14 11h6v-2h-6v2zM14 17h6v-2h-6v2z" />
+                </svg>
                 <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
               </div>
               <div className="space-y-3">
@@ -342,9 +355,22 @@ export default function Dashboard() {
                   <div key={memory.id} className="border-b border-gray-100 pb-2 last:border-b-0">
                     <div className="flex items-start space-x-2">
                       <div className="flex-shrink-0 mt-1">
-                        {memory.type === 'conversation' && <ChatBubbleLeftRightIcon className="w-4 h-4 text-blue-500" />}
-                        {memory.type === 'action' && <CheckCircleIcon className="w-4 h-4 text-green-500" />}
-                        {memory.type === 'system' && <CogIcon className="w-4 h-4 text-gray-500" />}
+                        {memory.type === 'conversation' && (
+                          <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                          </svg>
+                        )}
+                        {memory.type === 'action' && (
+                          <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                          </svg>
+                        )}
+                        {memory.type === 'system' && (
+                          <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                        )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-gray-900 truncate">{memory.content}</p>

@@ -6,14 +6,16 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: 'http://localhost:3001/api/:path*',
+        source: '/api/elizaos/:path*',
+        destination: '/api/elizaos',
       },
     ];
   },
   env: {
     ELIZAOS_API_URL: process.env.ELIZAOS_API_URL || 'http://localhost:3001',
   },
+  // For Vercel deployment
+  output: 'standalone',
 };
 
 module.exports = nextConfig; 
