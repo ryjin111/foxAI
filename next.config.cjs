@@ -15,7 +15,6 @@ const nextConfig = {
     // your project has ESLint errors.
     ignoreDuringBuilds: true,
   },
-
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
