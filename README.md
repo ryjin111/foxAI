@@ -1,15 +1,15 @@
-# 🦊 FoxAI - Advanced Crypto Analysis & Autonomous AI Agent
+# 🦊 FoxAI - Advanced Crypto Analysis & AI Assistant
 
-**AI-powered crypto analysis, market intelligence, and autonomous social media management with real-time insights, trend detection, and 24/7 autonomous operation via Vercel cron jobs.**
+**AI-powered crypto analysis, market intelligence, and social media management with real-time insights, trend detection, and manual control via chat interface.**
 
 ## 🚀 Features
 
-### **🤖 Autonomous AI Agent (Vercel Cron Jobs)**
-- **24/7 Autonomous Operation** - Runs continuously via Vercel cron jobs
-- **Scheduled Automation** - Automated workflows at specific intervals
-- **Multi-step Workflows** - Complex operations through API endpoints
-- **Real-world Actions** - Takes actions through integrated services
-- **No Server Maintenance** - Fully managed by Vercel infrastructure
+### **🤖 AI Assistant (Manual Control)**
+- **Interactive Chat Interface** - Talk to FoxAI directly
+- **On-Demand Analysis** - Get insights when you need them
+- **Manual Twitter Posting** - Generate and post tweets when you want
+- **Full Control** - You decide what and when to post
+- **No Automation Complexity** - Simple and straightforward
 
 ### **Core Capabilities**
 - 🤖 **AI-Powered Analysis** - DeepSeek AI integration for intelligent insights
@@ -23,8 +23,7 @@
 - 📊 **Market Sentiment Analysis** - Fear & Greed index and sentiment scoring
 
 ### **Twitter/X Features**
-- 🕐 **Hourly Crypto Updates** - Automated market updates every hour
-- 💬 **Smart Mention Replies** - AI-powered responses to mentions
+- 🎭 **Manual Tweet Generation** - Generate tweets on demand
 - 📊 **Market Analysis Posts** - Comprehensive market reports
 - 🎭 **Advanced Shitposting** - Context-aware viral content generation
 - 📈 **Trending Analysis Posts** - Real-time trending coin analysis
@@ -64,9 +63,6 @@ COINGECKO_API_KEY=your_coingecko_api_key
 
 # MCP Server
 MCP_SERVER_URL=http://localhost:3001
-
-# Vercel Cron Jobs (Optional - for security)
-CRON_SECRET=your_cron_secret_key
 ```
 
 ### **Local Development**
@@ -82,42 +78,34 @@ npm run dev
 npm run next:dev
 ```
 
-## 🤖 Autonomous AI Agent
+## 🤖 AI Assistant
 
 ### **Agent Personality**
-FoxAI is an autonomous AI agent specialized in Hyperliquid EVM analysis and NFT market intelligence with:
+FoxAI is an AI assistant specialized in Hyperliquid EVM analysis and NFT market intelligence with:
 - **Hyperliquid EVM expertise** - Deep knowledge of NFT trading and DeFi protocols
 - **Playful personality** - Makes complex crypto concepts accessible
 - **Bullish on Hyperliquid EVM** - Always optimistic about cross-chain trading
 - **Community engagement** - Loves sharing insights and building community
 
-### **Autonomous Workflows (Vercel Cron Jobs)**
+### **How to Use**
 
-#### **1. Hourly Market Updates**
-- **Schedule:** Every hour at the top of the hour
-- **Endpoint:** `/api/cron/hourly-market-update`
-- **Actions:** Fetch data → Analyze sentiment → Generate content → Post to Twitter
-- **Output:** Engaging Hyperliquid EVM market updates
+#### **1. Chat Interface**
+- **Open the web interface** - Navigate to your deployed app
+- **Ask questions** - "What's the current market sentiment?"
+- **Request analysis** - "Analyze Hyperliquid EVM market"
+- **Generate content** - "Create a tweet about NFT opportunities"
 
-#### **2. Mention Monitoring**
-- **Schedule:** Every 5 minutes
-- **Endpoint:** `/api/cron/mention-monitoring`
-- **Actions:** Check mentions → Analyze sentiment → Generate replies → Reply to mentions
-- **Output:** Smart, context-aware responses
+#### **2. Twitter Posting**
+- **Manual Control** - "Post to Twitter" or "Generate a tweet"
+- **Custom Content** - "Create a tweet about market analysis"
+- **Specific Topics** - "Post about Hyperliquid EVM NFTs"
 
-#### **3. NFT Collection Monitoring**
-- **Schedule:** Every 15 minutes
-- **Endpoint:** `/api/cron/nft-monitoring`
-- **Actions:** Fetch NFT data → Analyze performance → Identify opportunities
-- **Output:** Real-time NFT insights and trading opportunities
+#### **3. Market Analysis**
+- **Real-time Data** - "What's the current market sentiment?"
+- **NFT Collections** - "Show me NFT performance"
+- **Trending Coins** - "What's trending on Hyperliquid EVM?"
 
-#### **4. Daily Market Intelligence Report**
-- **Schedule:** Every day at 9 AM
-- **Endpoint:** `/api/cron/daily-report`
-- **Actions:** Gather comprehensive data → Generate report → Post analysis
-- **Output:** Daily market intelligence and insights
-
-### **Agent Commands**
+### **Example Commands**
 ```bash
 # Get agent status
 curl -X GET https://your-app.vercel.app/api/eliza
@@ -126,12 +114,6 @@ curl -X GET https://your-app.vercel.app/api/eliza
 curl -X POST https://your-app.vercel.app/api/eliza \
   -H "Content-Type: application/json" \
   -d '{"action": "send_message", "message": "Analyze current Hyperliquid EVM market"}'
-
-# Manual trigger cron jobs
-curl -X GET https://your-app.vercel.app/api/cron/hourly-market-update
-curl -X GET https://your-app.vercel.app/api/cron/mention-monitoring
-curl -X GET https://your-app.vercel.app/api/cron/nft-monitoring
-curl -X GET https://your-app.vercel.app/api/cron/daily-report
 ```
 
 ## 🧠 MCP Server Tools
@@ -147,7 +129,7 @@ curl -X GET https://your-app.vercel.app/api/cron/daily-report
 - `get_coin_price` - Current price for specific coins
 
 ### **Advanced Twitter/X Tools**
-- `post_hourly_crypto_update` - Automated hourly market updates
+- `post_hourly_crypto_update` - Generate and post market updates
 - `post_market_analysis` - Comprehensive market analysis posts
 - `post_project_score` - Individual coin analysis posts
 - `reply_to_mentions` - Smart AI-powered mention replies
@@ -158,7 +140,7 @@ curl -X GET https://your-app.vercel.app/api/cron/daily-report
 
 ### **Shitposting Tools**
 - `generate_shitpost` - AI-powered shitpost generation
-- `post_random_shitpost` - Automated shitpost posting
+- `post_random_shitpost` - Generate and post shitposts
 
 ### **Automation Tools**
 - `create_automation_rule` - Create automated posting rules
@@ -190,18 +172,13 @@ curl -X GET https://your-app.vercel.app/api/cron/daily-report
 - **Volume Spikes** - Unusual trading activity detection
 - **Timeframe Analysis** - 24h, 1h, 15m analysis
 
-## 🐦 Twitter/X Automation
+## 🐦 Twitter/X Features
 
-### **Hourly Updates**
-- **Market Sentiment** - Current market mood
-- **Fear & Greed Index** - Market psychology
-- **Top Gainers** - Best performing coins
-- **Trending Topics** - Hot crypto discussions
-
-### **Smart Replies**
-- **Sentiment-based Responses** - Context-aware replies
-- **Crypto Insights** - Educational content
-- **Engagement Optimization** - Viral potential analysis
+### **Manual Tweet Generation**
+- **Market Analysis** - Generate market update tweets
+- **NFT Insights** - Create NFT collection analysis
+- **Trending Topics** - Post about hot crypto topics
+- **Sentiment Posts** - Share market sentiment analysis
 
 ### **Content Types**
 - **Market Analysis** - Comprehensive reports
@@ -229,7 +206,7 @@ curl -X GET https://your-app.vercel.app/api/cron/daily-report
 - Premium analysis features
 - Advanced technical indicators
 - Exclusive market insights
-- Priority automation slots
+- Priority access features
 
 ### **Market Intelligence Reports**
 - Daily market summaries
@@ -243,13 +220,13 @@ curl -X GET https://your-app.vercel.app/api/cron/daily-report
 - Real-time market analysis
 - Technical trend detection
 - Risk assessment tools
-- Automated market updates
+- Manual market updates
 
 ### **For Content Creators**
 - Viral shitpost generation
 - Market analysis content
 - Trending topic insights
-- Automated social media
+- Manual social media posting
 
 ### **For Investors**
 - Project scoring and evaluation
@@ -257,11 +234,11 @@ curl -X GET https://your-app.vercel.app/api/cron/daily-report
 - Market sentiment analysis
 - Investment recommendations
 
-### **For Autonomous Operation**
-- 24/7 market monitoring
-- Automated social media management
-- Intelligent mention replies
-- Continuous market intelligence
+### **For Manual Control**
+- On-demand market monitoring
+- Manual social media management
+- Interactive analysis
+- Controlled content creation
 
 ## 🤝 Contributing
 
@@ -276,6 +253,6 @@ MIT License - see LICENSE file for details
 
 ---
 
-**🦊 FoxAI - Your autonomous AI-powered crypto analysis and Hyperliquid EVM specialist!** 🚀
+**🦊 FoxAI - Your AI-powered crypto analysis and Hyperliquid EVM specialist!** 🚀
 
-*Powered by Vercel cron jobs for 24/7 autonomous operation* 
+*Simple, manual control for maximum flexibility* 

@@ -19,31 +19,26 @@ export async function GET(req: Request) {
     const status = {
       isRunning: true,
       personality: 'Hyperliquid EVM specialist with NFT market intelligence',
-      workflows: [
-        'Hourly Market Updates (every hour) - /api/cron/hourly-market-update',
-        'Mention Monitoring (every 5 minutes) - /api/cron/mention-monitoring',
-        'NFT Collection Monitoring (every 15 minutes) - /api/cron/nft-monitoring',
-        'Daily Market Intelligence Report (daily at 9 AM) - /api/cron/daily-report'
+      mode: 'Manual Control - Use chat interface to interact with FoxAI',
+      capabilities: [
+        'Market Analysis - Ask about current market sentiment',
+        'NFT Collections - Get NFT performance insights',
+        'Twitter Posting - Generate and post tweets',
+        'Crypto Insights - Get Hyperliquid EVM analysis'
       ],
       services: {
         twitter: twitterService.isConnected(),
         crypto: true
-      },
-      cronJobs: {
-        hourlyMarketUpdate: '/api/cron/hourly-market-update',
-        mentionMonitoring: '/api/cron/mention-monitoring',
-        nftMonitoring: '/api/cron/nft-monitoring',
-        dailyReport: '/api/cron/daily-report'
       }
     };
 
     return Response.json({
       success: true,
       status,
-      message: 'FoxAI Autonomous Agent status retrieved successfully'
+      message: 'FoxAI is ready for manual interaction! Use the chat interface.'
     });
   } catch (error) {
-    console.error('Error getting autonomous agent status:', error);
+    console.error('Error getting FoxAI status:', error);
     return Response.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -91,7 +86,7 @@ export async function POST(req: Request) {
           const result = await twitterService.postRandomShitpost();
           response = `🐦 Posted to Twitter: ${result.success ? 'Success!' : 'Failed'} ${result.tweetId ? `(ID: ${result.tweetId})` : ''}`;
         } else {
-          response = `🦊 FoxAI here! I'm monitoring Hyperliquid EVM markets and NFT collections. Ask me about market analysis, NFT opportunities, or post updates! #Hyperliquid #EVM`;
+          response = `🦊 FoxAI here! I'm ready to help with Hyperliquid EVM analysis. Ask me about market analysis, NFT opportunities, or post updates! #Hyperliquid #EVM`;
         }
 
         return Response.json({
@@ -100,27 +95,14 @@ export async function POST(req: Request) {
           message: 'Message processed successfully'
         });
 
-      case 'get_status':
-        return Response.json({
-          success: true,
-          message: 'Use GET /api/eliza to get status'
-        });
-
-      case 'start':
-      case 'stop':
-        return Response.json({
-          success: true,
-          message: 'Agent runs automatically via Vercel cron jobs. Use /api/cron/* endpoints to trigger specific workflows.'
-        });
-
       default:
         return Response.json({
           success: false,
-          error: 'Invalid action. Supported actions: send_message, get_status'
+          error: 'Invalid action. Supported actions: send_message'
         }, { status: 400 });
     }
   } catch (error) {
-    console.error('Error with autonomous agent action:', error);
+    console.error('Error processing message:', error);
     return Response.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
