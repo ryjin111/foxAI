@@ -149,7 +149,7 @@ export class TwitterService {
   async replyToMentions(): Promise<any[]> {
     try {
       // Get mentions from the last hour
-      const mentions = await this.client.v2.userMentionTimeline({
+      const mentions = await this.client.v2.userMentionTimeline('me', {
         'tweet.fields': ['author_id', 'text', 'created_at'],
         'user.fields': ['username'],
         'max_results': 10
