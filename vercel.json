@@ -3,14 +3,5 @@
   "buildCommand": "npm run build:dashboard",
   "outputDirectory": ".next",
   "installCommand": "npm install",
-  "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/api/elizaos/(.*)",
-      "destination": "/api/elizaos"
-    }
-  ],
-  "env": {
-    "ELIZAOS_API_URL": "@elizaos-api-url"
-  }
+  "framework": "nextjs"
 } 
