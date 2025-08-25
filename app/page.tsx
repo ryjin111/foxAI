@@ -34,6 +34,11 @@ interface ElizaOSStatus {
   }>;
 }
 
+interface MessageResponse {
+  success: boolean;
+  response: string;
+}
+
 export default function Dashboard() {
   const [status, setStatus] = useState<ElizaOSStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -51,7 +56,7 @@ export default function Dashboard() {
     try {
       const response = await fetch('/api/elizaos/status');
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as ElizaOSStatus;
         setStatus(data);
       }
     } catch (error) {
@@ -109,7 +114,7 @@ export default function Dashboard() {
       });
       
       if (response.ok) {
-        const data = await response.json();
+        const data = await response.json() as MessageResponse;
         setChatHistory(prev => [...prev, { role: 'assistant', content: data.response }]);
       }
     } catch (error) {
@@ -272,8 +277,8 @@ export default function Dashboard() {
                 <input
                   type="text"
                   value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMessage(e.target.value)}
+                  onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && sendMessage()}
                   placeholder="Type your message..."
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fox-500 focus:border-transparent"
                   disabled={sending}
