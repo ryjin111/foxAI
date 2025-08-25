@@ -75,7 +75,7 @@ Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! ðŸ˜
       body: JSON.stringify({
         model: 'deepseek-chat',
         messages: conversation,
-        stream: true,
+        stream: false,
         temperature: 0.7,
         max_tokens: 500,
       }),
@@ -85,57 +85,15 @@ Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! ðŸ˜
       throw new Error(`DeepSeek API error: ${response.statusText}`)
     }
 
-    // Create a streaming response
-    const encoder = new TextEncoder()
-    const stream = new ReadableStream({
-      async start(controller) {
-        const reader = response.body?.getReader()
-        if (!reader) {
-          controller.close()
-          return
-        }
+    // Get the complete response
+    const data = await response.json()
+    const content = data.choices?.[0]?.message?.content || "Sorry, I couldn't generate a response."
 
-        try {
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) break
-
-            const chunk = new TextDecoder().decode(value)
-            const lines = chunk.split('\n')
-
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6)
-                if (data === '[DONE]') {
-                  controller.close()
-                  return
-                }
-
-                try {
-                  const parsed = JSON.parse(data)
-                  const content = parsed.choices?.[0]?.delta?.content
-                  if (content) {
-                    controller.enqueue(encoder.encode(content))
-                  }
-                } catch (e) {
-                  // Ignore parsing errors
-                }
-              }
-            }
-          }
-        } catch (error) {
-          console.error('Streaming error:', error)
-        } finally {
-          controller.close()
-        }
-      }
-    })
-
-    return new Response(stream, {
+    // Return the complete response
+    return new Response(content, {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
         'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive',
       },
     })
   } catch (error) {
