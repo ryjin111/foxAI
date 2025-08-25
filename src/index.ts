@@ -8,6 +8,7 @@ import {
 import dotenv from 'dotenv';
 import { TwitterService } from './services/twitter.js';
 import { AutomationService } from './services/automation.js';
+import { CryptoService } from './services/crypto.js';
 import { Logger } from './utils/logger.js';
 import { 
   TwitterConfig, 
@@ -21,6 +22,7 @@ class FoxAIMCPServer {
   private server: Server;
   private twitterService: TwitterService;
   private automationService: AutomationService;
+  private cryptoService: CryptoService;
   private logger: Logger;
 
   constructor() {
@@ -37,6 +39,7 @@ class FoxAIMCPServer {
 
     this.twitterService = new TwitterService(twitterConfig);
     this.automationService = new AutomationService(this.twitterService);
+    this.cryptoService = new CryptoService();
 
     // Initialize MCP server
     this.server = new Server(
@@ -63,7 +66,7 @@ class FoxAIMCPServer {
               properties: {
                 category: {
                   type: 'string',
-                  enum: ['meme', 'copypasta', 'troll', 'random'],
+                  enum: ['meme', 'copypasta', 'troll', 'random', 'crypto'],
                   description: 'Category of shitpost to generate',
                 },
               },
@@ -75,6 +78,56 @@ class FoxAIMCPServer {
             inputSchema: {
               type: 'object',
               properties: {},
+            },
+          },
+          // Crypto Tools
+          {
+            name: 'get_crypto_insight',
+            description: 'Get a crypto market insight with shitpost',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                coin: {
+                  type: 'string',
+                  description: 'Optional specific coin ID (e.g., bitcoin, ethereum)',
+                },
+              },
+            },
+          },
+          {
+            name: 'get_top_coins',
+            description: 'Get top cryptocurrencies by market cap',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                limit: {
+                  type: 'number',
+                  description: 'Number of coins to return',
+                  default: 10,
+                },
+              },
+            },
+          },
+          {
+            name: 'get_trending_coins',
+            description: 'Get trending cryptocurrencies',
+            inputSchema: {
+              type: 'object',
+              properties: {},
+            },
+          },
+          {
+            name: 'get_coin_price',
+            description: 'Get current price of a specific coin',
+            inputSchema: {
+              type: 'object',
+              properties: {
+                coinId: {
+                  type: 'string',
+                  description: 'Coin ID (e.g., bitcoin, ethereum)',
+                },
+              },
+              required: ['coinId'],
             },
           },
           // Social Media Tools
@@ -194,7 +247,12 @@ class FoxAIMCPServer {
         switch (name) {
           // Shitposting Tools
           case 'generate_shitpost':
-            const shitpost = this.twitterService.generateShitpost(args?.category as string);
+            let shitpost: string;
+            if (args?.category === 'crypto') {
+              shitpost = await this.cryptoService.getRandomCryptoInsight();
+            } else {
+              shitpost = this.twitterService.generateShitpost(args?.category as string);
+            }
             return {
               content: [
                 {
@@ -211,6 +269,51 @@ class FoxAIMCPServer {
                 {
                   type: 'text',
                   text: JSON.stringify(result, null, 2),
+                },
+              ],
+            };
+
+          // Crypto Tools
+          case 'get_crypto_insight':
+            const insight = await this.cryptoService.getRandomCryptoInsight();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: insight,
+                },
+              ],
+            };
+
+          case 'get_top_coins':
+            const topCoins = await this.cryptoService.getTopCoins(args?.limit as number);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(topCoins, null, 2),
+                },
+              ],
+            };
+
+          case 'get_trending_coins':
+            const trendingCoins = await this.cryptoService.getTrendingCoins();
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(trendingCoins, null, 2),
+                },
+              ],
+            };
+
+          case 'get_coin_price':
+            const price = await this.cryptoService.getCoinPrice(args?.coinId as string);
+            return {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify({ coinId: args?.coinId, price }, null, 2),
                 },
               ],
             };
@@ -296,6 +399,7 @@ class FoxAIMCPServer {
               services: {
                 twitter: this.twitterService.isConnected(),
                 automation: this.automationService.getRuleCount(),
+                crypto: 'connected',
               },
             };
             return {

@@ -1,13 +1,14 @@
-# FoxAI - AI Shitposting Assistant
+# FoxAI - AI Shitposting & Crypto Assistant
 
-An AI-powered shitposting assistant with MCP (Model Context Protocol) server and modern web interface.
+An AI-powered shitposting and crypto insights assistant with MCP (Model Context Protocol) server and modern web interface.
 
 ## Features
 
 - 🤖 **Shitposting Tools**: Generate random shitposts and memes
+- 🚀 **Crypto Insights**: Real-time crypto data and market analysis
 - 🐦 **Twitter Integration**: Post tweets and analyze sentiment
-- ⚡ **Automation**: Rule-based social media automation
-- 📊 **Trending Topics**: Get what's hot on Twitter
+- ⚡ **Automation**: Rule-based social media and crypto automation
+- 📊 **CoinGecko Integration**: Live cryptocurrency data
 - 🎯 **Sentiment Analysis**: Analyze text sentiment
 
 ## Quick Deploy to Vercel
@@ -41,15 +42,28 @@ vercel --prod
 
 The MCP server provides these tools:
 
-- `generate_shitpost` - Generate a random shitpost
+### Shitposting Tools
+- `generate_shitpost` - Generate a random shitpost (meme, copypasta, troll, random, crypto)
 - `post_random_shitpost` - Post a random shitpost to Twitter
-- `analyze_sentiment` - Analyze text sentiment
-- `post_tweet` - Post a tweet to Twitter
-- `get_trending_topics` - Get trending topics
+
+### Crypto Tools
+- `get_crypto_insight` - Get a crypto market insight with shitpost
+- `get_top_coins` - Get top cryptocurrencies by market cap
+- `get_trending_coins` - Get trending cryptocurrencies
+- `get_coin_price` - Get current price of a specific coin
+
+### Social Media Tools
+- `analyze_sentiment` - Analyze sentiment of tweets or text content
+- `post_tweet` - Post a tweet to Twitter/X
+- `get_trending_topics` - Get trending topics from Twitter
+
+### Automation Tools
 - `create_automation_rule` - Create automation rules
 - `list_automation_rules` - List automation rules
 - `delete_automation_rule` - Delete automation rules
-- `get_system_status` - Get system status
+
+### Utility Tools
+- `get_system_status` - Get system status and health information
 
 ## Local Development
 
@@ -70,6 +84,21 @@ npm run next:dev
 - **Copypasta**: Classic internet copypastas
 - **Troll**: Well-actually responses and trolling
 - **Random**: Random facts and unexpected content
+- **Crypto**: Crypto market insights and shitposts
+
+## Crypto Features
+
+- **Real-time Data**: Live cryptocurrency prices and market data
+- **Top Coins**: Get top cryptocurrencies by market cap
+- **Trending Coins**: See what's hot in the crypto world
+- **Price Tracking**: Check specific coin prices
+- **Crypto Shitposts**: Generate crypto-themed content
+
+## APIs Used
+
+- **CoinGecko API**: For cryptocurrency data (no API key required)
+- **Twitter API**: For posting tweets and sentiment analysis
+- **OpenAI API**: For AI chat functionality
 
 ## License
 
