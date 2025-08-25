@@ -89,28 +89,33 @@ FoxAI is an AI assistant specialized in Hyperliquid EVM analysis and NFT market 
 
 ### **How to Use**
 
-#### **1. Chat Interface**
+#### **1. Chat Interface (Main Way)**
 - **Open the web interface** - Navigate to your deployed app
 - **Ask questions** - "What's the current market sentiment?"
 - **Request analysis** - "Analyze Hyperliquid EVM market"
 - **Generate content** - "Create a tweet about NFT opportunities"
+- **Post to Twitter** - "Post to Twitter" or "Generate a tweet"
 
-#### **2. Twitter Posting**
-- **Manual Control** - "Post to Twitter" or "Generate a tweet"
-- **Custom Content** - "Create a tweet about market analysis"
-- **Specific Topics** - "Post about Hyperliquid EVM NFTs"
+#### **2. Example Chat Commands**
+```
+"Post to Twitter"
+"Analyze Hyperliquid EVM market"
+"Generate a tweet about NFTs"
+"What's the current market sentiment?"
+"Show me NFT performance"
+"Create a market analysis tweet"
+```
 
-#### **3. Market Analysis**
-- **Real-time Data** - "What's the current market sentiment?"
-- **NFT Collections** - "Show me NFT performance"
-- **Trending Coins** - "What's trending on Hyperliquid EVM?"
+#### **3. API Endpoint (Simple Status)**
+- **GET** `/api/eliza` - Get FoxAI status
+- **POST** `/api/eliza` - Send simple messages (limited functionality)
 
-### **Example Commands**
+### **Example API Usage**
 ```bash
 # Get agent status
 curl -X GET https://your-app.vercel.app/api/eliza
 
-# Send message to agent
+# Send simple message
 curl -X POST https://your-app.vercel.app/api/eliza \
   -H "Content-Type: application/json" \
   -d '{"action": "send_message", "message": "Analyze current Hyperliquid EVM market"}'
