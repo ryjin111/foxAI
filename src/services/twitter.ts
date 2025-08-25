@@ -99,8 +99,9 @@ export class TwitterService {
 
   async getTrendingTopics(count: number = 10): Promise<any[]> {
     try {
-      const trends = await this.client.v2.trendingTopics();
-      return trends.data?.slice(0, count) || [];
+      // Use a simpler approach for trending topics
+      const trends = await this.client.v1.trendsPlace(1); // 1 = worldwide
+      return trends[0]?.trends?.slice(0, count) || [];
     } catch (error) {
       this.logger.error('Failed to get trending topics:', error);
       return [];

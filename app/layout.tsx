@@ -1,16 +1,9 @@
-import React from 'react'
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata: Metadata = {
-  title: 'FoxAI - AI-Powered Trading Console',
-  description: 'Advanced AI trading automation with MCP server integration',
-  keywords: ['AI', 'Trading', 'Automation', 'MCP', 'Hyperliquid', 'Crypto'],
-  authors: [{ name: 'FoxAI Team' }],
-  viewport: 'width=device-width, initial-scale=1',
+  title: 'FoxAI - AI Shitposting Assistant',
+  description: 'AI-powered shitposting with MCP server and modern console',
 }
 
 export default function RootLayout({
@@ -19,11 +12,9 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased`}>
-        <div className="min-h-screen ai-console">
-          {children}
-        </div>
+    <html lang="en">
+      <body className="antialiased">
+        {children}
       </body>
     </html>
   )
