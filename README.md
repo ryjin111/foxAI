@@ -1,15 +1,15 @@
 # 🦊 FoxAI - Advanced Crypto Analysis & Autonomous AI Agent
 
-**AI-powered crypto analysis, market intelligence, and autonomous social media management with real-time insights, trend detection, and 24/7 autonomous operation powered by ElizaOS.**
+**AI-powered crypto analysis, market intelligence, and autonomous social media management with real-time insights, trend detection, and 24/7 autonomous operation.**
 
 ## 🚀 Features
 
-### **🤖 Autonomous AI Agent (ElizaOS)**
+### **🤖 Autonomous AI Agent**
 - **24/7 Autonomous Operation** - Runs continuously without human intervention
 - **Persistent Memory** - Learns from interactions and market patterns
 - **Multi-step Workflows** - Complex operations through natural language
-- **Plugin Architecture** - 90+ official plugins for unlimited capabilities
-- **Real-world Actions** - Takes actions in the real world through plugins
+- **Scheduled Automation** - Cron-based task scheduling
+- **Real-world Actions** - Takes actions through integrated services
 
 ### **Core Capabilities**
 - 🤖 **AI-Powered Analysis** - DeepSeek AI integration for intelligent insights
@@ -58,8 +58,7 @@ TWITTER_ACCESS_TOKEN=your_twitter_access_token
 TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret
 TWITTER_BEARER_TOKEN=your_twitter_bearer_token
 
-# ElizaOS Agent
-ELIZAOS_API_KEY=your_elizaos_api_key
+# Hyperliquid API
 HYPERLIQUID_API_URL=https://api.hyperliquid.xyz
 COINGECKO_API_KEY=your_coingecko_api_key
 
@@ -76,14 +75,14 @@ npm install
 # Start MCP server
 npm run dev
 
-# Start ElizaOS agent
-npm run eliza:dev
+# Start autonomous agent
+npm run agent:dev
 
 # Start Next.js app
 npm run next:dev
 ```
 
-## 🤖 ElizaOS Autonomous Agent
+## 🤖 Autonomous AI Agent
 
 ### **Agent Personality**
 FoxAI is an autonomous AI agent specialized in Hyperliquid EVM analysis and NFT market intelligence with:
@@ -109,10 +108,15 @@ FoxAI is an autonomous AI agent specialized in Hyperliquid EVM analysis and NFT 
 - **Actions:** Fetch NFT data → Analyze performance → Identify opportunities
 - **Output:** Real-time NFT insights and trading opportunities
 
+#### **4. Daily Market Intelligence Report**
+- **Schedule:** Every day at 9 AM
+- **Actions:** Gather comprehensive data → Generate report → Post analysis
+- **Output:** Daily market intelligence and insights
+
 ### **Agent Commands**
 ```bash
 # Start autonomous agent
-npm run eliza:dev
+npm run agent:dev
 
 # Send message to agent
 curl -X POST /api/eliza \
@@ -208,7 +212,6 @@ curl -X POST /api/eliza -d '{"action": "stop"}'
 - **CoinGecko API** - Real-time crypto data and market information
 - **Twitter API v2** - Social media posting and analysis
 - **DeepSeek AI** - Advanced AI analysis and content generation
-- **ElizaOS Framework** - Autonomous AI agent capabilities
 - **Hyperliquid API** - NFT and DeFi protocol data
 
 ## 🚀 Advanced Features
@@ -272,4 +275,4 @@ MIT License - see LICENSE file for details
 
 **🦊 FoxAI - Your autonomous AI-powered crypto analysis and Hyperliquid EVM specialist!** 🚀
 
-*Powered by ElizaOS - The most popular AI agentic framework* 
+*Powered by advanced autonomous agent technology* 

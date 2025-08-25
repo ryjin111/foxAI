@@ -1,15 +1,15 @@
-import { foxAIElizaAgent } from '../../../src/eliza-agent.js';
+import { foxAIAutonomousAgent } from '../../../src/autonomous-agent.js';
 
 export async function GET(req: Request) {
   try {
-    const status = await foxAIElizaAgent.getStatus();
+    const status = await foxAIAutonomousAgent.getStatus();
     return Response.json({
       success: true,
       status,
-      message: 'FoxAI ElizaOS Agent status retrieved successfully'
+      message: 'FoxAI Autonomous Agent status retrieved successfully'
     });
   } catch (error) {
-    console.error('Error getting ElizaOS agent status:', error);
+    console.error('Error getting autonomous agent status:', error);
     return Response.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
@@ -23,17 +23,17 @@ export async function POST(req: Request) {
 
     switch (action) {
       case 'start':
-        await foxAIElizaAgent.start();
+        await foxAIAutonomousAgent.start();
         return Response.json({
           success: true,
-          message: 'FoxAI ElizaOS Agent started successfully! 🦊✨'
+          message: 'FoxAI Autonomous Agent started successfully! 🦊✨'
         });
 
       case 'stop':
-        await foxAIElizaAgent.stop();
+        await foxAIAutonomousAgent.stop();
         return Response.json({
           success: true,
-          message: 'FoxAI ElizaOS Agent stopped successfully!'
+          message: 'FoxAI Autonomous Agent stopped successfully!'
         });
 
       case 'send_message':
@@ -44,15 +44,15 @@ export async function POST(req: Request) {
           }, { status: 400 });
         }
         
-        const response = await foxAIElizaAgent.sendMessage(message);
+        const response = await foxAIAutonomousAgent.sendMessage(message);
         return Response.json({
           success: true,
           response,
-          message: 'Message sent to FoxAI ElizaOS Agent successfully'
+          message: 'Message sent to FoxAI Autonomous Agent successfully'
         });
 
       case 'get_status':
-        const status = await foxAIElizaAgent.getStatus();
+        const status = await foxAIAutonomousAgent.getStatus();
         return Response.json({
           success: true,
           status,
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
         }, { status: 400 });
     }
   } catch (error) {
-    console.error('Error with ElizaOS agent action:', error);
+    console.error('Error with autonomous agent action:', error);
     return Response.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'

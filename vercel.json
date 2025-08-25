@@ -4,10 +4,28 @@
   "outputDirectory": ".next",
   "framework": "nextjs",
   "functions": {
-    "app/api/**/*.ts": {
+    "app/api/cron/hyperliquid-update/route.ts": {
       "maxDuration": 30
     }
   },
+  "crons": [
+    {
+      "path": "/api/cron/hourly-market-update",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/mention-monitoring", 
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/nft-monitoring",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/daily-report",
+      "schedule": "0 9 * * *"
+    }
+  ],
   "env": {
     "NODE_ENV": "production"
   }
