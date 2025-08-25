@@ -1,11 +1,3 @@
-import { OpenAIStream, StreamingTextResponse } from 'ai'
-import { OpenAIApi, Configuration } from 'openai-edge'
-
-const config = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
-})
-const openai = new OpenAIApi(config)
-
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
 
@@ -36,7 +28,13 @@ export async function POST(req: Request) {
       }
     })
     
-    return new StreamingTextResponse(stream)
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
   }
 
   // Create a system message that includes FoxAI context
@@ -133,7 +131,13 @@ Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! ðŸ˜
       }
     })
 
-    return new StreamingTextResponse(stream)
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
   } catch (error) {
     console.error('DeepSeek API error:', error)
     
@@ -147,6 +151,12 @@ Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! ðŸ˜
       }
     })
     
-    return new StreamingTextResponse(stream)
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/plain; charset=utf-8',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    })
   }
 } 
