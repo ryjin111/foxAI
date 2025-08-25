@@ -1,4 +1,74 @@
-// Twitter Configuration
+// Core ElizaOS Types
+export interface AgentPersonality {
+  name: string;
+  traits: string[];
+  goals: string[];
+  behavior: string[];
+}
+
+export interface AgentMemory {
+  id: string;
+  timestamp: Date;
+  type: 'conversation' | 'action' | 'observation' | 'decision' | 'system';
+  content: string;
+  metadata?: Record<string, any>;
+}
+
+export interface AgentState {
+  isActive: boolean;
+  currentTask?: string;
+  lastAction?: string;
+  mood: 'happy' | 'focused' | 'curious' | 'determined' | 'neutral';
+  energy: number; // 0-100
+  knowledge: Record<string, any>;
+}
+
+export interface Plugin {
+  id: string;
+  name: string;
+  version: string;
+  description: string;
+  capabilities: string[];
+  isEnabled: boolean;
+  init(): Promise<void>;
+  execute(action: string, params?: any): Promise<any>;
+  cleanup?(): Promise<void>;
+}
+
+export interface Workflow {
+  id: string;
+  name: string;
+  description: string;
+  steps: WorkflowStep[];
+  schedule?: string; // cron expression
+  isActive: boolean;
+  lastRun?: Date;
+  nextRun?: Date;
+}
+
+export interface WorkflowStep {
+  id: string;
+  name: string;
+  pluginId: string;
+  action: string;
+  params?: any;
+  condition?: string;
+  onSuccess?: string;
+  onError?: string;
+}
+
+export interface Task {
+  id: string;
+  type: 'scheduled' | 'triggered' | 'manual';
+  workflowId: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  startedAt?: Date;
+  completedAt?: Date;
+  result?: any;
+  error?: string;
+}
+
+// Twitter Plugin Types
 export interface TwitterConfig {
   apiKey: string;
   apiSecret: string;
@@ -7,94 +77,65 @@ export interface TwitterConfig {
   bearerToken: string;
 }
 
-// Automation Rule
-export interface AutomationRule {
-  id: string;
-  name: string;
-  trigger: string;
-  conditions: any[];
-  actions: any[];
-  enabled: boolean;
-  createdAt: number;
-}
-
-// Shitposting Templates
-export interface ShitpostTemplate {
-  id: string;
-  name: string;
-  template: string;
-  category: 'meme' | 'copypasta' | 'troll' | 'random' | 'crypto' | 'analysis';
-  tags: string[];
-}
-
-// Sentiment Analysis Result
-export interface SentimentResult {
+export interface TweetContent {
   text: string;
-  sentiment: 'positive' | 'negative' | 'neutral';
-  score: number;
-  keywords: string[];
+  hashtags?: string[];
+  mentions?: string[];
+  media?: string[];
 }
 
-// Crypto Data
+// Crypto Plugin Types
 export interface CryptoData {
-  id: string;
   symbol: string;
+  price: number;
+  change24h: number;
+  volume: number;
+  marketCap: number;
+}
+
+export interface HyperliquidData {
+  asset: string;
+  price: number;
+  volume24h: number;
+  change24h: number;
+  marketCap: number;
+  nftCollections?: NFTCollection[];
+}
+
+export interface NFTCollection {
   name: string;
-  current_price: number;
-  price_change_24h: number;
-  price_change_percentage_24h: number;
-  market_cap: number;
-  volume_24h: number;
-  image: string;
+  floorPrice: number;
+  volume24h: number;
+  holders: number;
+  items: number;
 }
 
-// Trending Coin
-export interface TrendingCoin {
-  item: {
-    id: string;
-    name: string;
-    symbol: string;
-    market_cap_rank: number;
-    price_btc: number;
-    score: number;
-  };
-}
-
-// Market Analysis
-export interface MarketAnalysis {
-  timestamp: string;
-  overall_sentiment: 'bullish' | 'bearish' | 'neutral';
-  market_cap_change_24h: number;
-  volume_change_24h: number;
-  top_gainers: CryptoData[];
-  top_losers: CryptoData[];
-  trending_topics: string[];
-  fear_greed_index: number;
-}
-
-// Project Score
-export interface ProjectScore {
-  coin_id: string;
-  name: string;
-  score: number;
-  factors: {
-    market_cap: number;
-    volume: number;
-    price_stability: number;
-    community_growth: number;
-    developer_activity: number;
-  };
-  recommendation: 'buy' | 'hold' | 'sell';
-  risk_level: 'low' | 'medium' | 'high';
-}
-
-// Trend Detection
-export interface TrendDetection {
-  coin_id: string;
-  trend_type: 'breakout' | 'breakdown' | 'consolidation' | 'accumulation';
+// AI Plugin Types
+export interface AIResponse {
+  content: string;
   confidence: number;
-  support_level?: number;
-  resistance_level?: number;
-  volume_spike: boolean;
-  timeframe: string;
+  reasoning?: string;
+  suggestions?: string[];
+}
+
+export interface AIContext {
+  conversation: string[];
+  currentTask?: string;
+  agentState: AgentState;
+  availablePlugins: string[];
+}
+
+// System Types
+export interface SystemConfig {
+  port: number;
+  logLevel: 'debug' | 'info' | 'warn' | 'error';
+  plugins: Record<string, any>;
+  workflows: Record<string, any>;
+}
+
+export interface LogEntry {
+  timestamp: Date;
+  level: 'debug' | 'info' | 'warn' | 'error';
+  message: string;
+  metadata?: Record<string, any>;
 } 

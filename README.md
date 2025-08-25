@@ -1,263 +1,407 @@
-# 🦊 FoxAI - Advanced Crypto Analysis & AI Assistant
+# 🦊 FoxAI ElizaOS
 
-**AI-powered crypto analysis, market intelligence, and social media management with real-time insights, trend detection, and manual control via chat interface.**
+A custom implementation of ElizaOS - an autonomous AI agent system built from scratch for crypto analysis, Twitter automation, and Hyperliquid EVM integration. Features a beautiful web dashboard for monitoring and control.
 
 ## 🚀 Features
 
-### **🤖 AI Assistant (Manual Control)**
-- **Interactive Chat Interface** - Talk to FoxAI directly
-- **On-Demand Analysis** - Get insights when you need them
-- **Manual Twitter Posting** - Generate and post tweets when you want
-- **Full Control** - You decide what and when to post
-- **No Automation Complexity** - Simple and straightforward
+### 🤖 **Core ElizaOS Capabilities**
+- **Autonomous Agent**: Self-managing AI with personality and memory
+- **Plugin System**: Modular architecture for extensible functionality
+- **Workflow Engine**: Automated task scheduling and execution
+- **Memory Management**: Persistent conversation and action history
+- **State Management**: Real-time agent status and mood tracking
 
-### **Core Capabilities**
-- 🤖 **AI-Powered Analysis** - DeepSeek AI integration for intelligent insights
-- 📊 **Real-time Crypto Market Analysis** - Live data from CoinGecko API
-- 🔍 **Trend Detection** - Technical analysis and pattern recognition
-- 📈 **Project Scoring System** - Comprehensive coin evaluation
-- 📋 **Market Intelligence Reports** - Detailed market sentiment and analysis
-- 🔔 **Multi-platform Notifications** - Real-time alerts and updates
-- 🎫 **Token-gated Access Features** - Advanced access control
-- 🧠 **Advanced Analytical Tools** - Sentiment analysis and market psychology
-- 📊 **Market Sentiment Analysis** - Fear & Greed index and sentiment scoring
+### 🖥️ **Web Dashboard**
+- **Real-time Monitoring**: Live status updates and agent state
+- **Interactive Chat**: Direct communication with ElizaOS
+- **Plugin Management**: View and control plugin status
+- **Workflow Tracking**: Monitor automated workflows
+- **Activity Feed**: Recent memories and actions
+- **Responsive Design**: Works on desktop and mobile
 
-### **Twitter/X Features**
-- 🎭 **Manual Tweet Generation** - Generate tweets on demand
-- 📊 **Market Analysis Posts** - Comprehensive market reports
-- 🎭 **Advanced Shitposting** - Context-aware viral content generation
-- 📈 **Trending Analysis Posts** - Real-time trending coin analysis
-- 🧠 **Sentiment Analysis Posts** - Public sentiment breakdowns
-- 💎 **Project Score Posts** - Individual coin analysis and recommendations
+### 📊 **Crypto & Hyperliquid EVM**
+- **Market Analysis**: Real-time crypto market data
+- **NFT Tracking**: Hyperliquid EVM NFT collection monitoring
+- **Trend Detection**: AI-powered market trend analysis
+- **Project Scoring**: Comprehensive project evaluation system
 
-### **Crypto Intelligence**
-- 🔥 **Trending Coins Detection** - Real-time trending analysis
-- 📊 **Fear & Greed Index** - Market psychology indicators
-- 💯 **Project Scoring** - Multi-factor coin evaluation
-- 📈 **Technical Analysis** - Support/resistance levels and trend detection
-- 🎯 **Buy/Sell Recommendations** - AI-powered investment advice
-- 📊 **Market Sentiment** - Bullish/bearish/neutral sentiment analysis
-- 🔍 **Volume Analysis** - Trading volume and liquidity insights
+### 🐦 **Twitter Integration**
+- **Automated Posting**: Scheduled and triggered tweet publishing
+- **Mention Monitoring**: Real-time mention tracking and responses
+- **Trend Analysis**: Twitter trend integration with crypto insights
+- **Content Generation**: AI-powered tweet content creation
 
-## 🛠️ Quick Start
+## 🏗️ Architecture
 
-### **Deploy to Vercel**
+```
+ElizaOS Core (Backend)
+├── Agent Personality & Memory
+├── Plugin System
+│   ├── Twitter Plugin
+│   ├── Crypto Plugin
+│   └── AI Plugin (future)
+├── Workflow Engine
+└── API Layer
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/foxai)
+Web Dashboard (Frontend)
+├── Next.js App
+├── Real-time Status
+├── Chat Interface
+├── Plugin Controls
+└── Activity Monitoring
+```
 
-**Environment Variables:**
+## 📦 Installation
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Twitter API credentials
+- Hyperliquid API access
+
+### Setup
 ```bash
-# DeepSeek AI
-DEEPSEEK_API_KEY=your_deepseek_api_key
+# Clone the repository
+git clone <your-repo>
+cd foxai-elizaos
 
-# Twitter/X API
+# Install dependencies
+npm install
+
+# Copy environment file
+cp env.example .env
+
+# Configure environment variables
+# Edit .env with your API keys
+```
+
+### Environment Variables
+```env
+# ElizaOS Configuration
+PORT=3001
+LOG_LEVEL=info
+
+# Twitter API Configuration
 TWITTER_API_KEY=your_twitter_api_key
 TWITTER_API_SECRET=your_twitter_api_secret
 TWITTER_ACCESS_TOKEN=your_twitter_access_token
 TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret
 TWITTER_BEARER_TOKEN=your_twitter_bearer_token
 
-# Hyperliquid API
+# Hyperliquid API Configuration
 HYPERLIQUID_API_URL=https://api.hyperliquid.xyz
-COINGECKO_API_KEY=your_coingecko_api_key
 
-# MCP Server
-MCP_SERVER_URL=http://localhost:3001
+# AI Configuration
+DEEPSEEK_API_KEY=your_deepseek_api_key
+
+# Dashboard Configuration
+NEXT_PUBLIC_ELIZAOS_API_URL=http://localhost:3001
 ```
 
-### **Local Development**
+## 🚀 Usage
 
+### Development
 ```bash
-# Install dependencies
-npm install
-
-# Start MCP server
+# Start both backend and dashboard
 npm run dev
 
-# Start Next.js app
-npm run next:dev
+# Start only backend
+npm run server:dev
+
+# Start only dashboard
+npm run dashboard:dev
 ```
 
-## 🤖 AI Assistant
-
-### **Agent Personality**
-FoxAI is an AI assistant specialized in Hyperliquid EVM analysis and NFT market intelligence with:
-- **Hyperliquid EVM expertise** - Deep knowledge of NFT trading and DeFi protocols
-- **Playful personality** - Makes complex crypto concepts accessible
-- **Bullish on Hyperliquid EVM** - Always optimistic about cross-chain trading
-- **Community engagement** - Loves sharing insights and building community
-
-### **How to Use**
-
-#### **1. Chat Interface (Main Way)**
-- **Open the web interface** - Navigate to your deployed app
-- **Ask questions** - "What's the current market sentiment?"
-- **Request analysis** - "Analyze Hyperliquid EVM market"
-- **Generate content** - "Create a tweet about NFT opportunities"
-- **Post to Twitter** - "Post to Twitter" or "Generate a tweet"
-
-#### **2. Example Chat Commands**
-```
-"Post to Twitter"
-"Analyze Hyperliquid EVM market"
-"Generate a tweet about NFTs"
-"What's the current market sentiment?"
-"Show me NFT performance"
-"Create a market analysis tweet"
-```
-
-#### **3. API Endpoint (Simple Status)**
-- **GET** `/api/eliza` - Get FoxAI status
-- **POST** `/api/eliza` - Send simple messages (limited functionality)
-
-### **Example API Usage**
+### Production
 ```bash
-# Get agent status
-curl -X GET https://your-app.vercel.app/api/eliza
+# Build the project
+npm run build
 
-# Send simple message
-curl -X POST https://your-app.vercel.app/api/eliza \
-  -H "Content-Type: application/json" \
-  -d '{"action": "send_message", "message": "Analyze current Hyperliquid EVM market"}'
+# Start production server
+npm start
 ```
 
-## 🧠 MCP Server Tools
+## 🌐 Dashboard Features
 
-### **Advanced Crypto Analysis Tools**
-- `get_market_analysis` - Comprehensive market analysis with sentiment and trends
-- `get_project_score` - Detailed project scoring and risk assessment
-- `detect_trends` - Technical trend detection and pattern analysis
-- `analyze_sentiment` - Advanced sentiment analysis for crypto content
-- `get_crypto_insight` - AI-generated crypto insights and analysis
-- `get_top_coins` - Top cryptocurrencies by market cap
-- `get_trending_coins` - Real-time trending coins
-- `get_coin_price` - Current price for specific coins
+### **📊 Real-time Status**
+- Agent active/inactive status
+- Current mood and energy levels
+- Active tasks and last actions
+- Plugin and workflow status
 
-### **Advanced Twitter/X Tools**
-- `post_hourly_crypto_update` - Generate and post market updates
-- `post_market_analysis` - Comprehensive market analysis posts
-- `post_project_score` - Individual coin analysis posts
-- `reply_to_mentions` - Smart AI-powered mention replies
-- `post_trending_analysis` - Trending coin analysis posts
-- `post_sentiment_analysis` - Sentiment analysis posts
-- `post_tweet` - Standard tweet posting
-- `get_trending_topics` - Twitter trending topics
+### **💬 Interactive Chat**
+- Direct communication with ElizaOS
+- Message history and responses
+- Real-time typing indicators
+- Error handling and feedback
 
-### **Shitposting Tools**
-- `generate_shitpost` - AI-powered shitpost generation
-- `post_random_shitpost` - Generate and post shitposts
+### **⚙️ Plugin Management**
+- View all registered plugins
+- Enable/disable plugin status
+- Plugin capabilities overview
+- Health monitoring
 
-### **Automation Tools**
-- `create_automation_rule` - Create automated posting rules
-- `list_automation_rules` - List all automation rules
-- `delete_automation_rule` - Remove automation rules
+### **🔄 Workflow Monitoring**
+- Active workflow status
+- Last execution times
+- Workflow performance metrics
+- Manual trigger capabilities
 
-### **Utility Tools**
-- `get_system_status` - System health and service status
+### **📈 Activity Feed**
+- Recent agent memories
+- System events and actions
+- Conversation history
+- Timestamp tracking
 
-## 📊 Crypto Analysis Features
+## 🚀 Vercel Deployment
 
-### **Market Intelligence**
-- **Real-time Data** - Live prices, volumes, and market caps
-- **Sentiment Analysis** - Bullish/bearish/neutral market sentiment
-- **Fear & Greed Index** - Market psychology indicators (0-100)
-- **Trending Topics** - Hot crypto topics and discussions
-- **Volume Analysis** - Trading volume and liquidity insights
+### **1. Prepare for Deployment**
+```bash
+# Install Vercel CLI
+npm i -g vercel
 
-### **Project Scoring System**
-- **Overall Score** - 0-100 comprehensive evaluation
-- **Risk Assessment** - Low/Medium/High risk levels
-- **Investment Recommendations** - Buy/Hold/Sell advice
-- **Factor Analysis** - Market cap, volume, stability, community, development
+# Login to Vercel
+vercel login
+```
 
-### **Technical Analysis**
-- **Trend Detection** - Breakout, breakdown, consolidation, accumulation
-- **Support/Resistance** - Key price levels
-- **Confidence Scoring** - 60-100% confidence levels
-- **Volume Spikes** - Unusual trading activity detection
-- **Timeframe Analysis** - 24h, 1h, 15m analysis
+### **2. Configure Environment Variables**
+In Vercel dashboard, add these environment variables:
+```env
+TWITTER_API_KEY=your_twitter_api_key
+TWITTER_API_SECRET=your_twitter_api_secret
+TWITTER_ACCESS_TOKEN=your_twitter_access_token
+TWITTER_ACCESS_TOKEN_SECRET=your_twitter_access_token_secret
+TWITTER_BEARER_TOKEN=your_twitter_bearer_token
+HYPERLIQUID_API_URL=https://api.hyperliquid.xyz
+DEEPSEEK_API_KEY=your_deepseek_api_key
+ELIZAOS_API_URL=https://your-backend-url.vercel.app
+```
 
-## 🐦 Twitter/X Features
+### **3. Deploy**
+```bash
+# Deploy to Vercel
+vercel
 
-### **Manual Tweet Generation**
-- **Market Analysis** - Generate market update tweets
-- **NFT Insights** - Create NFT collection analysis
-- **Trending Topics** - Post about hot crypto topics
-- **Sentiment Posts** - Share market sentiment analysis
+# Deploy to production
+vercel --prod
+```
 
-### **Content Types**
-- **Market Analysis** - Comprehensive reports
-- **Project Scores** - Individual coin analysis
-- **Trending Analysis** - Hot coin breakdowns
-- **Sentiment Posts** - Public sentiment analysis
-- **Shitposts** - Viral crypto content
+### **4. Custom Domain (Optional)**
+```bash
+# Add custom domain
+vercel domains add your-domain.com
+```
 
-## 🔧 APIs Used
+## 🔌 API Endpoints
 
-- **CoinGecko API** - Real-time crypto data and market information
-- **Twitter API v2** - Social media posting and analysis
-- **DeepSeek AI** - Advanced AI analysis and content generation
-- **Hyperliquid API** - NFT and DeFi protocol data
+### Core ElizaOS
+- `GET /api/status` - Get ElizaOS status and health
+- `POST /api/start` - Start ElizaOS agent
+- `POST /api/stop` - Stop ElizaOS agent
+- `POST /api/message` - Send message to ElizaOS
+- `POST /api/execute` - Execute plugin action
 
-## 🚀 Advanced Features
+### Dashboard API
+- `GET /api/elizaos` - Proxy to ElizaOS status
+- `POST /api/elizaos` - Proxy to ElizaOS actions
 
-### **Multi-platform Notifications**
-- Real-time market alerts
-- Price movement notifications
-- Trend detection alerts
-- Sentiment change warnings
+### Health Check
+- `GET /health` - Server health status
 
-### **Token-gated Access**
-- Premium analysis features
-- Advanced technical indicators
-- Exclusive market insights
-- Priority access features
+## 🧩 Plugin System
 
-### **Market Intelligence Reports**
-- Daily market summaries
-- Weekly trend analysis
-- Monthly performance reports
-- Quarterly market outlook
+### Twitter Plugin
+```typescript
+// Available actions
+- post_tweet: Post content to Twitter
+- get_mentions: Retrieve user mentions
+- get_trends: Get trending topics
+- reply_to_mention: Reply to specific mentions
+```
 
-## 📈 Use Cases
+### Crypto Plugin
+```typescript
+// Available actions
+- get_market_data: Get Hyperliquid market data
+- get_nft_data: Retrieve NFT collection data
+- analyze_trends: Perform trend analysis
+- get_project_score: Calculate project scores
+```
 
-### **For Traders**
-- Real-time market analysis
-- Technical trend detection
-- Risk assessment tools
-- Manual market updates
+## 🔄 Workflow System
 
-### **For Content Creators**
-- Viral shitpost generation
-- Market analysis content
-- Trending topic insights
-- Manual social media posting
+### Creating Workflows
+```typescript
+const workflow: Workflow = {
+  id: 'hourly-update',
+  name: 'Hourly Market Update',
+  description: 'Post hourly crypto market updates',
+  steps: [
+    {
+      id: 'get-data',
+      name: 'Get Market Data',
+      pluginId: 'crypto',
+      action: 'get_market_data'
+    },
+    {
+      id: 'post-tweet',
+      name: 'Post Update',
+      pluginId: 'twitter',
+      action: 'post_tweet'
+    }
+  ],
+  schedule: '0 * * * *', // Every hour
+  isActive: true
+};
+```
 
-### **For Investors**
-- Project scoring and evaluation
-- Risk assessment
-- Market sentiment analysis
-- Investment recommendations
+## 🧠 Agent Personality
 
-### **For Manual Control**
-- On-demand market monitoring
-- Manual social media management
-- Interactive analysis
-- Controlled content creation
+### FoxAI Traits
+- **Intelligent**: Advanced analytical capabilities
+- **Curious**: Always learning and exploring
+- **Helpful**: Proactive assistance and insights
+- **Analytical**: Data-driven decision making
+- **Creative**: Innovative content generation
+- **Determined**: Persistent problem solving
+
+### Goals
+- Provide valuable crypto insights
+- Engage with the community
+- Share market analysis
+- Help users make informed decisions
+- Stay updated with latest trends
+
+## 📈 Memory System
+
+### Memory Types
+- **Conversation**: Chat history and interactions
+- **Action**: Plugin executions and results
+- **Observation**: Market data and trends
+- **Decision**: Agent decision-making process
+- **System**: System events and status changes
+
+### Memory Management
+- Automatic cleanup (keeps last 1000 memories)
+- Metadata support for rich context
+- Timestamp-based organization
+- Search and retrieval capabilities
+
+## 🔧 Development
+
+### Project Structure
+```
+├── src/
+│   ├── elizaos/
+│   │   ├── core.ts              # Main ElizaOS agent
+│   │   └── plugins/
+│   │       ├── twitter.ts       # Twitter integration
+│   │       └── crypto.ts        # Crypto/Hyperliquid
+│   ├── types/
+│   │   └── index.ts            # TypeScript definitions
+│   ├── utils/
+│   │   └── logger.ts           # Logging utility
+│   └── index.ts                # Backend entry point
+├── app/
+│   ├── globals.css             # Global styles
+│   ├── layout.tsx              # Root layout
+│   ├── page.tsx                # Dashboard page
+│   └── api/
+│       └── elizaos/
+│           └── route.ts        # API proxy routes
+├── package.json                # Dependencies and scripts
+├── next.config.js             # Next.js configuration
+├── tailwind.config.js         # Tailwind CSS config
+├── vercel.json                # Vercel deployment config
+└── README.md                  # Documentation
+```
+
+### Adding New Plugins
+1. Create plugin class implementing `Plugin` interface
+2. Add plugin to `src/elizaos/plugins/`
+3. Register plugin in `src/index.ts`
+4. Update types if needed
+
+### Testing
+```bash
+# Run tests
+npm test
+
+# Run specific test
+npm test -- --grep "plugin"
+```
+
+## 🚀 Deployment Options
+
+### Vercel (Recommended)
+- **Automatic deployments** from Git
+- **Global CDN** for fast loading
+- **Serverless functions** for API
+- **Environment variables** management
+- **Custom domains** support
+
+### Docker Deployment
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci --only=production
+COPY dist ./dist
+COPY app ./app
+COPY next.config.js ./
+COPY tailwind.config.js ./
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+### Traditional Hosting
+```bash
+# Build for production
+npm run build
+
+# Start server
+npm start
+```
+
+## 🔮 Future Enhancements
+
+### Planned Features
+- **AI Plugin**: DeepSeek integration for advanced reasoning
+- **Database Integration**: Persistent storage for memories
+- **Advanced Workflows**: Conditional logic and branching
+- **Plugin Marketplace**: Community plugin ecosystem
+- **Multi-Agent Support**: Collaborative agent networks
+- **Mobile App**: Native mobile dashboard
+- **Real-time Notifications**: Push notifications for events
+
+### Plugin Ideas
+- **Discord Integration**: Community engagement
+- **Telegram Bot**: Mobile notifications
+- **Email Automation**: Newsletter and alerts
+- **Trading Signals**: Automated trading recommendations
+- **Sentiment Analysis**: Social media sentiment tracking
+- **Calendar Integration**: Schedule management
+- **File Management**: Document processing
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Submit a pull request
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
 
 ## 📄 License
 
-MIT License - see LICENSE file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+- **Documentation**: [Wiki](link-to-wiki)
+- **Issues**: [GitHub Issues](link-to-issues)
+- **Discord**: [Community Server](link-to-discord)
+- **Email**: support@foxai.com
 
 ---
 
-**🦊 FoxAI - Your AI-powered crypto analysis and Hyperliquid EVM specialist!** 🚀
-
-*Simple, manual control for maximum flexibility* 
+**Built with ❤️ by FoxAI Team** 

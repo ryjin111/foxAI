@@ -1,477 +1,365 @@
-'use client'
+'use client';
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react';
+import { 
+  PlayIcon, 
+  StopIcon, 
+  ChatBubbleLeftRightIcon,
+  CogIcon,
+  ChartBarIcon,
+  BellIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ClockIcon
+} from '@heroicons/react/24/outline';
 
-export default function AIConsole() {
-  const [activeTab, setActiveTab] = useState('dashboard')
-  const [input, setInput] = useState('')
-  const [messages, setMessages] = useState<Array<{ id: string; role: string; content: string }>>([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  
-  // Dynamic stats state
-  const [stats, setStats] = useState({
-    shitpostsGenerated: 0,
-    cryptoInsights: 0,
-    tweetsPosted: 0,
-    systemStatus: 'Online'
-  })
+interface ElizaOSStatus {
+  isActive: boolean;
+  personality: {
+    name: string;
+    traits: string[];
+    goals: string[];
+  };
+  state: {
+    mood: string;
+    energy: number;
+    currentTask?: string;
+    lastAction?: string;
+  };
+  plugins: Array<{
+    id: string;
+    name: string;
+    isEnabled: boolean;
+  }>;
+  workflows: Array<{
+    id: string;
+    name: string;
+    isActive: boolean;
+    lastRun?: string;
+  }>;
+  recentMemories: Array<{
+    id: string;
+    timestamp: string;
+    type: string;
+    content: string;
+  }>;
+}
+
+export default function Dashboard() {
+  const [status, setStatus] = useState<ElizaOSStatus | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [message, setMessage] = useState('');
+  const [chatHistory, setChatHistory] = useState<Array<{role: string, content: string}>>([]);
+  const [sending, setSending] = useState(false);
+
+  const apiUrl = process.env.NEXT_PUBLIC_ELIZAOS_API_URL || 'http://localhost:3001';
 
   useEffect(() => {
-    setMounted(true)
-    loadStats()
-  }, [])
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 5000); // Refresh every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
 
-  // Load dynamic stats
-  const loadStats = async () => {
+  const fetchStatus = async () => {
     try {
-      // Get stats from localStorage or initialize
-      const savedStats = localStorage.getItem('foxai-stats')
-      if (savedStats) {
-        setStats(JSON.parse(savedStats))
-      } else {
-        // Initialize with some default values
-        const initialStats = {
-          shitpostsGenerated: Math.floor(Math.random() * 50) + 20,
-          cryptoInsights: Math.floor(Math.random() * 30) + 10,
-          tweetsPosted: Math.floor(Math.random() * 20) + 5,
-          systemStatus: 'Online'
-        }
-        setStats(initialStats)
-        localStorage.setItem('foxai-stats', JSON.stringify(initialStats))
+      const response = await fetch(`${apiUrl}/api/status`);
+      if (response.ok) {
+        const data = await response.json();
+        setStatus(data);
       }
     } catch (error) {
-      console.error('Error loading stats:', error)
+      console.error('Failed to fetch status:', error);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
-  // Reset stats (for testing)
-  const resetStats = () => {
-    const newStats = {
-      shitpostsGenerated: 0,
-      cryptoInsights: 0,
-      tweetsPosted: 0,
-      systemStatus: 'Online'
-    }
-    setStats(newStats)
-    localStorage.setItem('foxai-stats', JSON.stringify(newStats))
-  }
-
-  // Update stats when actions are performed
-  const updateStats = (type: string) => {
-    setStats(prev => {
-      const newStats = { ...prev }
-      switch (type) {
-        case 'shitpost':
-          newStats.shitpostsGenerated += 1
-          break
-        case 'crypto':
-          newStats.cryptoInsights += 1
-          break
-        case 'tweet':
-          newStats.tweetsPosted += 1
-          break
-      }
-      localStorage.setItem('foxai-stats', JSON.stringify(newStats))
-      return newStats
-    })
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value)
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim()) return
-
-    const userMessage = { id: Date.now().toString(), role: 'user', content: input }
-    setMessages(prev => [...prev, userMessage])
-    setInput('')
-    setIsLoading(true)
-
+  const startElizaOS = async () => {
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${apiUrl}/api/start`, { method: 'POST' });
+      if (response.ok) {
+        await fetchStatus();
+      }
+    } catch (error) {
+      console.error('Failed to start ElizaOS:', error);
+    }
+  };
+
+  const stopElizaOS = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/stop`, { method: 'POST' });
+      if (response.ok) {
+        await fetchStatus();
+      }
+    } catch (error) {
+      console.error('Failed to stop ElizaOS:', error);
+    }
+  };
+
+  const sendMessage = async () => {
+    if (!message.trim()) return;
+    
+    setSending(true);
+    const userMessage = message;
+    setMessage('');
+    
+    // Add user message to chat
+    setChatHistory(prev => [...prev, { role: 'user', content: userMessage }]);
+    
+    try {
+      const response = await fetch(`${apiUrl}/api/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: [...messages, userMessage] })
-      })
-
+        body: JSON.stringify({ message: userMessage })
+      });
+      
       if (response.ok) {
-        const reader = response.body?.getReader()
-        if (reader) {
-          const decoder = new TextDecoder()
-          let aiMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: '' }
-          setMessages(prev => [...prev, aiMessage])
-          
-          while (true) {
-            const { done, value } = await reader.read()
-            if (done) break
-            
-            const chunk = decoder.decode(value)
-            aiMessage = { ...aiMessage, content: aiMessage.content + chunk }
-            setMessages(prev => [...prev.slice(0, -1), aiMessage])
-          }
-        }
+        const data = await response.json();
+        setChatHistory(prev => [...prev, { role: 'assistant', content: data.response }]);
       }
     } catch (error) {
-      console.error('Chat error:', error)
-      const errorMessage = { id: (Date.now() + 1).toString(), role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }
-      setMessages(prev => [...prev, errorMessage])
+      console.error('Failed to send message:', error);
+      setChatHistory(prev => [...prev, { role: 'assistant', content: 'Sorry, I encountered an error. Please try again.' }]);
     } finally {
-      setIsLoading(false)
+      setSending(false);
     }
-  }
+  };
 
-  // Handle quick actions
-  const handleQuickAction = async (action: string) => {
-    switch (action) {
-      case 'shitpost':
-        updateStats('shitpost')
-        // Simulate generating a shitpost
-        const shitpost = "🚀 Just deployed my AI-powered blockchain solution to the cloud. Disrupting the industry one commit at a time! #TechBro #Innovation"
-        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: `Generated shitpost: ${shitpost}` }])
-        break
-      case 'crypto':
-        updateStats('crypto')
-        // Simulate crypto insight
-        const insight = "📊 Bitcoin is currently at $43,250 with a 2.3% increase in the last 24h. Market sentiment is bullish! 🚀 #Crypto #Bitcoin"
-        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: `Crypto insight: ${insight}` }])
-        break
-      case 'tweet':
-        updateStats('tweet')
-        // Simulate posting tweet
-        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: '🐦 Tweet posted successfully! Check your Twitter account.' }])
-        break
-      case 'coins':
-        updateStats('crypto')
-        // Simulate getting top coins
-        setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', content: '📈 Top coins: BTC $43,250, ETH $2,650, SOL $98.50, ADA $0.45' }])
-        break
-    }
-  }
-
-  if (!mounted) {
-    return <div className="min-h-screen bg-gray-50 flex items-center justify-center">Loading...</div>
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-fox-500"></div>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b bg-white shadow-sm">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <span className="text-2xl">🦊</span>
-              <div>
-                <h1 className="text-xl font-bold">FoxAI</h1>
-                <p className="text-sm text-gray-600">AI Shitposting & Crypto Assistant</p>
+      <header className="bg-white shadow-sm border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-6">
+            <div className="flex items-center">
+              <div className="flex-shrink-0">
+                <h1 className="text-2xl font-bold text-gradient">🦊 FoxAI ElizaOS</h1>
               </div>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                <span className="text-sm text-gray-600">{stats.systemStatus}</span>
+                <div className={`w-3 h-3 rounded-full ${status?.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                <span className="text-sm text-gray-600">
+                  {status?.isActive ? 'Active' : 'Inactive'}
+                </span>
               </div>
-              <span className="text-gray-400">⏰</span>
-              <span className="text-sm text-gray-600">
-                {new Date().toLocaleTimeString()}
-              </span>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-6">
-        {/* Tabs */}
-        <div className="flex space-x-1 bg-white rounded-lg p-1 mb-6">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: '🤖' },
-            { id: 'chat', label: 'Chat', icon: '💬' },
-            { id: 'crypto', label: 'Crypto', icon: '🚀' },
-            { id: 'automation', label: 'Automation', icon: '⚡' },
-            { id: 'settings', label: 'Settings', icon: '⚙️' },
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-                activeTab === tab.id
-                  ? 'bg-blue-500 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              <span className="mr-2">{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Dashboard */}
-        {activeTab === 'dashboard' && (
-          <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { label: 'Shitposts Generated', value: stats.shitpostsGenerated.toString(), icon: '✨' },
-                { label: 'Crypto Insights', value: stats.cryptoInsights.toString(), icon: '🚀' },
-                { label: 'Tweets Posted', value: stats.tweetsPosted.toString(), icon: '🐦' },
-                { label: 'System Status', value: stats.systemStatus, icon: '📊' },
-              ].map((stat, index) => (
-                <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
-                  <div className="flex items-center justify-between">
-                    <h3 className="text-sm font-medium text-gray-600">{stat.label}</h3>
-                    <span className="text-xl">{stat.icon}</span>
-                  </div>
-                  <div className="text-2xl font-bold mt-2">{stat.value}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Quick Actions */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Control Panel */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Status Card */}
+            <div className="card">
               <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-lg font-semibold">Quick Actions</h2>
-                  <p className="text-gray-600">Generate content and get crypto insights</p>
-                </div>
-                <button
-                  onClick={resetStats}
-                  className="px-3 py-1 text-xs bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
-                >
-                  Reset Stats
-                </button>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[
-                  { icon: '✨', label: 'Generate Shitpost', action: 'shitpost' },
-                  { icon: '🚀', label: 'Crypto Insight', action: 'crypto' },
-                  { icon: '📈', label: 'Top Coins', action: 'coins' },
-                  { icon: '🐦', label: 'Post to Twitter', action: 'tweet' },
-                ].map((action, index) => (
+                <h2 className="text-xl font-semibold text-gray-900">Agent Status</h2>
+                <div className="flex space-x-2">
                   <button
-                    key={index}
-                    onClick={() => handleQuickAction(action.action)}
-                    className="h-20 border border-gray-200 rounded-lg flex flex-col items-center justify-center space-y-2 hover:bg-gray-50 transition-colors"
+                    onClick={startElizaOS}
+                    disabled={status?.isActive}
+                    className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
-                    <span className="text-2xl">{action.icon}</span>
-                    <span className="text-sm">{action.label}</span>
+                    <PlayIcon className="w-4 h-4" />
+                    <span>Start</span>
                   </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-              <p className="text-gray-600 mb-4">Latest shitposts and crypto insights</p>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-4">
-                  <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                  <div className="flex-1">
-                    <p className="text-sm">Generated a crypto insight</p>
-                    <p className="text-xs text-gray-500">2 minutes ago</p>
-                  </div>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Crypto</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  <div className="flex-1">
-                    <p className="text-sm">Posted shitpost to Twitter</p>
-                    <p className="text-xs text-gray-500">5 minutes ago</p>
-                  </div>
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Posted</span>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <div className="h-2 w-2 rounded-full bg-yellow-500"></div>
-                  <div className="flex-1">
-                    <p className="text-sm">Analyzed Bitcoin price</p>
-                    <p className="text-xs text-gray-500">10 minutes ago</p>
-                  </div>
-                  <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs">BTC</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Chat */}
-        {activeTab === 'chat' && (
-          <div className="bg-white rounded-lg shadow-sm h-[600px] flex flex-col">
-            <div className="p-6 border-b">
-              <h2 className="text-lg font-semibold">Chat with FoxAI</h2>
-              <p className="text-gray-600">Generate shitposts, get crypto insights, and more</p>
-            </div>
-            <div className="flex-1 flex flex-col p-6">
-              <div className="flex-1 overflow-y-auto mb-4 space-y-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                  <button
+                    onClick={stopElizaOS}
+                    disabled={!status?.isActive}
+                    className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-2"
                   >
-                    <div
-                      className={`max-w-[80%] rounded-lg px-4 py-2 ${
-                        message.role === 'user'
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100'
-                      }`}
-                    >
-                      <p className="text-sm">{message.content}</p>
+                    <StopIcon className="w-4 h-4" />
+                    <span>Stop</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-2">Current State</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Mood:</span>
+                      <span className="font-medium capitalize">{status?.state.mood}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Energy:</span>
+                      <span className="font-medium">{status?.state.energy}%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Current Task:</span>
+                      <span className="font-medium">{status?.state.currentTask || 'None'}</span>
                     </div>
                   </div>
-                ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-gray-100 rounded-lg px-4 py-2">
-                      <p className="text-sm">Thinking...</p>
+                </div>
+                
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-medium text-gray-900 mb-2">Personality</h3>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Name:</span>
+                      <span className="font-medium">{status?.personality.name}</span>
                     </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Traits:</span>
+                      <span className="font-medium">{status?.personality.traits.length}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Goals:</span>
+                      <span className="font-medium">{status?.personality.goals.length}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Chat Interface */}
+            <div className="card">
+              <div className="flex items-center space-x-2 mb-4">
+                <ChatBubbleLeftRightIcon className="w-5 h-5 text-gray-600" />
+                <h2 className="text-xl font-semibold text-gray-900">Chat with ElizaOS</h2>
+              </div>
+              
+              <div className="bg-gray-50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
+                {chatHistory.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <ChatBubbleLeftRightIcon className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                    <p>Start a conversation with ElizaOS</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {chatHistory.map((msg, index) => (
+                      <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
+                          msg.role === 'user' 
+                            ? 'bg-fox-500 text-white' 
+                            : 'bg-white text-gray-900 border border-gray-200'
+                        }`}>
+                          <p className="text-sm">{msg.content}</p>
+                        </div>
+                      </div>
+                    ))}
+                    {sending && (
+                      <div className="flex justify-start">
+                        <div className="bg-white text-gray-900 border border-gray-200 px-4 py-2 rounded-lg">
+                          <div className="flex space-x-1">
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
-              <form onSubmit={handleSubmit} className="flex space-x-2">
+              
+              <div className="flex space-x-2">
                 <input
-                  value={input}
-                  onChange={handleInputChange}
-                  placeholder="Ask me to generate a shitpost, get crypto insights, or post to Twitter..."
-                  disabled={isLoading}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  type="text"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                  placeholder="Type your message..."
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fox-500 focus:border-transparent"
+                  disabled={sending}
                 />
                 <button
-                  type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={sendMessage}
+                  disabled={!message.trim() || sending}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Send
                 </button>
-              </form>
+              </div>
             </div>
           </div>
-        )}
 
-        {/* Crypto */}
-        {activeTab === 'crypto' && (
+          {/* Sidebar */}
           <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">🚀 Crypto Insights</h2>
-              <p className="text-gray-600 mb-4">Get real-time crypto data and generate insights</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="text-2xl mb-2">📈</div>
-                  <h3 className="font-medium">Top Coins</h3>
-                  <p className="text-sm text-gray-600">Get top cryptocurrencies</p>
-                </button>
-                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="text-2xl mb-2">🔥</div>
-                  <h3 className="font-medium">Trending</h3>
-                  <p className="text-sm text-gray-600">See what's hot</p>
-                </button>
-                <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="text-2xl mb-2">💎</div>
-                  <h3 className="font-medium">Price Check</h3>
-                  <p className="text-sm text-gray-600">Check specific coins</p>
-                </button>
+            {/* Plugins Status */}
+            <div className="card">
+              <div className="flex items-center space-x-2 mb-4">
+                <CogIcon className="w-5 h-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Plugins</h2>
+              </div>
+              <div className="space-y-3">
+                {status?.plugins.map((plugin) => (
+                  <div key={plugin.id} className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-900">{plugin.name}</span>
+                    <span className={plugin.isEnabled ? 'status-active' : 'status-inactive'}>
+                      {plugin.isEnabled ? 'Active' : 'Inactive'}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-lg font-semibold mb-4">💬 Crypto Shitposts</h2>
-              <p className="text-gray-600 mb-4">Generate crypto-themed shitposts and insights</p>
-              <div className="space-y-4">
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm">🚀 Bitcoin just went 🚀 UP! 5.23% in 24h! To the moon or to the ground? Only time will tell! 🌙 #Crypto #MoonMission</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm">📊 Ethereum is pumping! Market cap: $234.5B. This is either the best or worst investment of your life! 💎 #DiamondHands</p>
-                </div>
-                <div className="p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm">🔥 Solana is pumping like crazy! 12.45% change in 24h. Your portfolio is either celebrating or crying right now! 😅 #CryptoLife</p>
-                </div>
+            {/* Workflows */}
+            <div className="card">
+              <div className="flex items-center space-x-2 mb-4">
+                <ChartBarIcon className="w-5 h-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Workflows</h2>
+              </div>
+              <div className="space-y-3">
+                {status?.workflows.map((workflow) => (
+                  <div key={workflow.id} className="border-b border-gray-100 pb-2 last:border-b-0">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-sm font-medium text-gray-900">{workflow.name}</span>
+                      <span className={workflow.isActive ? 'status-active' : 'status-inactive'}>
+                        {workflow.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                    {workflow.lastRun && (
+                      <div className="flex items-center space-x-1 text-xs text-gray-500">
+                        <ClockIcon className="w-3 h-3" />
+                        <span>Last run: {new Date(workflow.lastRun).toLocaleString()}</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
-          </div>
-        )}
 
-        {/* Automation */}
-        {activeTab === 'automation' && (
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-lg font-semibold mb-4">Automation Rules</h2>
-            <p className="text-gray-600 mb-4">Set up automated shitposting and crypto insights</p>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Daily Crypto Update</h3>
-                  <p className="text-sm text-gray-600">Posts crypto market insights every day at 9 AM</p>
-                </div>
-                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Active</span>
+            {/* Recent Memories */}
+            <div className="card">
+              <div className="flex items-center space-x-2 mb-4">
+                <BellIcon className="w-5 h-5 text-gray-600" />
+                <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
               </div>
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Shitpost Generator</h3>
-                  <p className="text-sm text-gray-600">Posts random shitposts every 4 hours</p>
-                </div>
-                <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Active</span>
-              </div>
-              <div className="flex items-center justify-between p-4 border rounded-lg">
-                <div>
-                  <h3 className="font-medium">Crypto Price Alerts</h3>
-                  <p className="text-sm text-gray-600">Alerts when major coins have big moves</p>
-                </div>
-                <span className="px-2 py-1 bg-gray-100 text-gray-800 rounded text-xs">Inactive</span>
+              <div className="space-y-3">
+                {status?.recentMemories.slice(0, 5).map((memory) => (
+                  <div key={memory.id} className="border-b border-gray-100 pb-2 last:border-b-0">
+                    <div className="flex items-start space-x-2">
+                      <div className="flex-shrink-0 mt-1">
+                        {memory.type === 'conversation' && <ChatBubbleLeftRightIcon className="w-4 h-4 text-blue-500" />}
+                        {memory.type === 'action' && <CheckCircleIcon className="w-4 h-4 text-green-500" />}
+                        {memory.type === 'system' && <CogIcon className="w-4 h-4 text-gray-500" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-gray-900 truncate">{memory.content}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(memory.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
-        )}
-
-        {/* Settings */}
-        {activeTab === 'settings' && (
-          <div className="bg-white rounded-lg p-6 shadow-sm">
-            <h2 className="text-lg font-semibold mb-4">Settings</h2>
-            <p className="text-gray-600 mb-4">Configure your FoxAI shitposting and crypto assistant</p>
-            <div className="space-y-6">
-              <div>
-                <h3 className="font-medium mb-2">Twitter API Configuration</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Your Twitter API keys are configured and ready to use.
-                </p>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  <span className="px-2 py-1 bg-gray-100 rounded text-xs">Connected</span>
-                </div>
-              </div>
-              <div className="border-t pt-6">
-                <h3 className="font-medium mb-2">CoinGecko API</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Connected to CoinGecko for real-time crypto data.
-                </p>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  <span className="px-2 py-1 bg-gray-100 rounded text-xs">Connected</span>
-                </div>
-              </div>
-              <div className="border-t pt-6">
-                <h3 className="font-medium mb-2">DeepSeek AI</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Connected to DeepSeek for intelligent responses.
-                </p>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  <span className="px-2 py-1 bg-gray-100 rounded text-xs">Connected</span>
-                </div>
-              </div>
-              <div className="border-t pt-6">
-                <h3 className="font-medium mb-2">MCP Server Status</h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  The MCP server provides tools for shitposting, crypto insights, and automation.
-                </p>
-                <div className="flex items-center space-x-2">
-                  <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                  <span className="px-2 py-1 bg-gray-100 rounded text-xs">Running</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        </div>
       </div>
     </div>
-  )
+  );
 } 
