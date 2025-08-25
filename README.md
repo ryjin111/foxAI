@@ -17,6 +17,13 @@ An intelligent AI agent that manages the OnChainHyperFoxes X (Twitter) account, 
 - **EVM ecosystem updates** - Highlight new projects and developments
 - **Fox community achievements** - Celebrate holder milestones and rare mints
 
+### CoinGecko Market Data Integration
+- **Real-time crypto prices** - Bitcoin, Ethereum, and other major cryptocurrencies
+- **Trending coins analysis** - Track what's hot in the crypto market
+- **NFT collection analytics** - Compare OnChainHyperFoxes with other collections
+- **DeFi protocol data** - Monitor TVL and protocol performance
+- **Market overview** - Global crypto market statistics and trends
+
 ### AI-Powered Features
 - **Intelligent content creation** based on real-time Hyperliquid data
 - **Contextual responses** to fox community mentions and comments
@@ -28,6 +35,7 @@ An intelligent AI agent that manages the OnChainHyperFoxes X (Twitter) account, 
 - **Next.js 14** - React framework with App Router
 - **Vercel AI SDK** - AI agent development and streaming
 - **Hyperliquid EVM APIs** - Blockchain data access
+- **CoinGecko MCP Server** - Real-time cryptocurrency market data
 - **Twitter API v2** - X (Twitter) account management
 - **DeepSeek API** - Advanced AI reasoning and content generation
 - **Tailwind CSS** - Modern UI styling
@@ -96,6 +104,8 @@ Open [http://localhost:3000](http://localhost:3000) to see the AI agent interfac
 - **Natural language commands** - "Post a tweet about OnChainHyperFoxes floor price"
 - **Multi-step actions** - "Check mentions and reply to fox community"
 - **Data-driven content** - "Get Hyperliquid analytics and create a fox-themed tweet"
+- **Market analysis** - "What's the current Bitcoin price and trending coins?"
+- **NFT comparisons** - "Compare OnChainHyperFoxes with other NFT collections"
 
 ### Quick Actions
 - **Post Fox GM Tweet** - Post daily GM tweet with fox emoji and Hyperliquid

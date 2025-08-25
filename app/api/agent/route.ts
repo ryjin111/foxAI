@@ -3,6 +3,7 @@ import { SeishinZTwitterClient } from '@/lib/twitter';
 import { PersonalityEngine, FOX_PERSONALITY } from '@/lib/ai-personality';
 import { DeepSeekClient } from '@/lib/deepseek-client';
 import { HyperliquidClient } from '@/lib/hyperliquid';
+import { CoinGeckoMCPClient } from '@/lib/coingecko-mcp';
 import { enhancedLearning } from '@/lib/enhanced-learning';
 import { shinZDB } from '@/lib/database';
 import { accessCodeManager } from '@/lib/access-codes';
@@ -160,6 +161,7 @@ export async function POST(req: NextRequest) {
       // Initialize clients
   const twitterClient = new SeishinZTwitterClient();
   const hyperliquidClient = new HyperliquidClient();
+  const coinGeckoClient = new CoinGeckoMCPClient();
   const personalityEngine = new PersonalityEngine(FOX_PERSONALITY);
     
     // Initialize database and learning system
@@ -560,6 +562,32 @@ export async function POST(req: NextRequest) {
               const ecosystemData = await hyperliquidClient.getEcosystemProjects();
               if (ecosystemData.success) {
                 additionalData += `\n\n🌐 **Hyperliquid Ecosystem:**\n${ecosystemData.data.projects.length} active projects\nLatest: ${ecosystemData.data.developments[0].title}`;
+              }
+            }
+            
+            // Add CoinGecko market data when requested
+            if (currentUserMessage.includes('market data') || currentUserMessage.includes('crypto prices') || currentUserMessage.includes('trending coins') || currentUserMessage.includes('bitcoin') || currentUserMessage.includes('ethereum')) {
+              const coinGeckoData = await coinGeckoClient.getPriceData(['bitcoin', 'ethereum']);
+              if (coinGeckoData.success) {
+                const btc = coinGeckoData.data.bitcoin;
+                const eth = coinGeckoData.data.ethereum;
+                additionalData += `\n\n💰 **Crypto Market Data:**\nBTC: $${btc.usd.toLocaleString()} (${btc.usd_24h_change > 0 ? '+' : ''}${btc.usd_24h_change.toFixed(2)}%)\nETH: $${eth.usd.toLocaleString()} (${eth.usd_24h_change > 0 ? '+' : ''}${eth.usd_24h_change.toFixed(2)}%)`;
+              }
+            }
+            
+            if (currentUserMessage.includes('trending') || currentUserMessage.includes('top gainers') || currentUserMessage.includes('market movers')) {
+              const trendingData = await coinGeckoClient.getTrendingCoins();
+              if (trendingData.success) {
+                const topTrending = trendingData.data.coins.slice(0, 3);
+                additionalData += `\n\n🔥 **Trending Coins:**\n${topTrending.map((coin: any) => `${coin.item.name} (${coin.item.symbol.toUpperCase()})`).join('\n')}`;
+              }
+            }
+            
+            if (currentUserMessage.includes('nft market') || currentUserMessage.includes('nft collections') || currentUserMessage.includes('nft data')) {
+              const nftData = await coinGeckoClient.getNFTCollections();
+              if (nftData.success) {
+                const topCollections = nftData.data.collections.slice(0, 3);
+                additionalData += `\n\n🎨 **Top NFT Collections:**\n${topCollections.map((collection: any) => `${collection.name}: $${collection.floor_price_usd.toLocaleString()}`).join('\n')}`;
               }
             }
             
