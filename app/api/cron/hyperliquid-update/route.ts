@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { TwitterService } from '../../../../src/services/twitter.js';
 import { TwitterConfig } from '../../../../src/types/index.js';
 
@@ -11,7 +10,7 @@ const HYPERLIQUID_UPDATE_TEMPLATES = [
   "🔥 Hyperliquid EVM Update: Volume up 12%, new NFT collections trending. The future of cross-chain trading! #Hyperliquid #EVM"
 ];
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   try {
     // Check if this is a valid cron request
     const { searchParams } = new URL(req.url);
@@ -19,7 +18,7 @@ export async function GET(req: NextRequest) {
     
     // Optional: Add a secret key for security
     if (process.env.CRON_SECRET && secret !== process.env.CRON_SECRET) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if we already posted an update in the last hour
@@ -32,7 +31,7 @@ export async function GET(req: NextRequest) {
       const hoursSinceLastUpdate = (now.getTime() - lastUpdateTime.getTime()) / (1000 * 60 * 60);
       
       if (hoursSinceLastUpdate < 1) {
-        return NextResponse.json({ 
+        return Response.json({ 
           message: 'Hyperliquid update already posted in the last hour',
           nextUpdate: new Date(lastUpdateTime.getTime() + 60 * 60 * 1000).toISOString()
         });
@@ -57,7 +56,7 @@ export async function GET(req: NextRequest) {
       // Store the timestamp of this update
       localStorage.setItem(lastUpdateKey, now.toISOString());
       
-      return NextResponse.json({
+      return Response.json({
         success: true,
         message: 'Hyperliquid EVM update posted successfully',
         tweetId: result.tweetId,
@@ -65,7 +64,7 @@ export async function GET(req: NextRequest) {
         timestamp: now.toISOString()
       });
     } else {
-      return NextResponse.json({
+      return Response.json({
         success: false,
         error: result.error,
         details: result.details
@@ -74,7 +73,7 @@ export async function GET(req: NextRequest) {
     
   } catch (error) {
     console.error('Error posting Hyperliquid update:', error);
-    return NextResponse.json({
+    return Response.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
@@ -82,7 +81,7 @@ export async function GET(req: NextRequest) {
 }
 
 // Manual trigger endpoint for testing
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
     // Initialize Twitter service
     const twitterConfig: TwitterConfig = {
@@ -99,7 +98,7 @@ export async function POST(req: NextRequest) {
     const result = await twitterService.postHourlyCryptoUpdate();
     
     if (result.success) {
-      return NextResponse.json({
+      return Response.json({
         success: true,
         message: 'Hyperliquid EVM update posted successfully',
         tweetId: result.tweetId,
@@ -107,7 +106,7 @@ export async function POST(req: NextRequest) {
         timestamp: new Date().toISOString()
       });
     } else {
-      return NextResponse.json({
+      return Response.json({
         success: false,
         error: result.error,
         details: result.details
@@ -116,7 +115,7 @@ export async function POST(req: NextRequest) {
     
   } catch (error) {
     console.error('Error posting Hyperliquid update:', error);
-    return NextResponse.json({
+    return Response.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 });
