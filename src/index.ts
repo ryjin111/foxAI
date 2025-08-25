@@ -6,41 +6,27 @@ import {
   Tool,
 } from '@modelcontextprotocol/sdk/types.js';
 import dotenv from 'dotenv';
-import { HyperliquidService } from './services/hyperliquid.js';
 import { TwitterService } from './services/twitter.js';
 import { AutomationService } from './services/automation.js';
 import { Logger } from './utils/logger.js';
 import { 
-  HyperliquidConfig, 
   TwitterConfig, 
-  AutomationRule, 
-  TradingSignal,
-  MarketData,
-  Position,
-  Order 
+  AutomationRule
 } from './types/index.js';
 
 // Load environment variables
 dotenv.config();
 
-class HyperliquidMCPServer {
+class FoxAIMCPServer {
   private server: Server;
-  private hyperliquidService: HyperliquidService;
   private twitterService: TwitterService;
   private automationService: AutomationService;
   private logger: Logger;
 
   constructor() {
-    this.logger = new Logger('HyperliquidMCP');
+    this.logger = new Logger('FoxAIMCP');
     
     // Initialize services
-    const hyperliquidConfig: HyperliquidConfig = {
-      apiKey: process.env.HYPERLIQUID_API_KEY || '',
-      secretKey: process.env.HYPERLIQUID_SECRET_KEY || '',
-      baseUrl: process.env.HYPERLIQUID_BASE_URL || 'https://api.hyperliquid.xyz',
-      wsUrl: process.env.HYPERLIQUID_WS_URL || 'wss://api.hyperliquid.xyz/ws',
-    };
-
     const twitterConfig: TwitterConfig = {
       apiKey: process.env.TWITTER_API_KEY || '',
       apiSecret: process.env.TWITTER_API_SECRET || '',
@@ -49,14 +35,13 @@ class HyperliquidMCPServer {
       bearerToken: process.env.TWITTER_BEARER_TOKEN || '',
     };
 
-    this.hyperliquidService = new HyperliquidService(hyperliquidConfig);
     this.twitterService = new TwitterService(twitterConfig);
-    this.automationService = new AutomationService(this.hyperliquidService, this.twitterService);
+    this.automationService = new AutomationService(this.twitterService);
 
     // Initialize MCP server
     this.server = new Server(
       {
-        name: 'hyperliquid-mcp',
+        name: 'foxai-mcp',
         version: '1.0.0',
       }
     );
@@ -65,213 +50,134 @@ class HyperliquidMCPServer {
   }
 
   private setupTools(): void {
-    // Trading Tools
+    // Core Tools
     this.server.setRequestHandler(ListToolsRequestSchema, async () => {
       return {
         tools: [
-          // Market Data Tools
+          // Shitposting Tools
           {
-            name: 'get_market_data',
-            description: 'Get current market data for specified symbols or all markets',
+            name: 'generate_shitpost',
+            description: 'Generate a random shitpost',
             inputSchema: {
               type: 'object',
               properties: {
-                symbol: {
+                category: {
                   type: 'string',
-                  description: 'Optional symbol to get data for specific market',
+                  enum: ['meme', 'copypasta', 'troll', 'random'],
+                  description: 'Category of shitpost to generate',
                 },
               },
             },
           },
           {
-            name: 'get_positions',
-            description: 'Get current trading positions',
+            name: 'post_random_shitpost',
+            description: 'Post a random shitpost to Twitter',
             inputSchema: {
               type: 'object',
               properties: {},
             },
           },
+          // Social Media Tools
           {
-            name: 'place_order',
-            description: 'Place a new trading order',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                symbol: {
-                  type: 'string',
-                  description: 'Trading symbol (e.g., BTC, ETH)',
-                },
-                side: {
-                  type: 'string',
-                  enum: ['buy', 'sell'],
-                  description: 'Order side',
-                },
-                size: {
-                  type: 'number',
-                  description: 'Order size',
-                },
-                price: {
-                  type: 'number',
-                  description: 'Order price',
-                },
-              },
-              required: ['symbol', 'side', 'size'],
-            },
-          },
-          {
-            name: 'cancel_order',
-            description: 'Cancel an existing order',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                orderId: {
-                  type: 'string',
-                  description: 'Order ID to cancel',
-                },
-              },
-              required: ['orderId'],
-            },
-          },
-          {
-            name: 'get_order_history',
-            description: 'Get order history',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                limit: {
-                  type: 'number',
-                  description: 'Number of orders to retrieve',
-                  default: 100,
-                },
-              },
-            },
-          },
-          {
-            name: 'generate_trading_signals',
-            description: 'Generate trading signals for a symbol',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                symbol: {
-                  type: 'string',
-                  description: 'Symbol to generate signals for',
-                },
-              },
-              required: ['symbol'],
-            },
-          },
-
-          // Twitter/X Tools
-          {
-            name: 'post_tweet',
-            description: 'Post a tweet to X (Twitter)',
+            name: 'analyze_sentiment',
+            description: 'Analyze sentiment of tweets or text content',
             inputSchema: {
               type: 'object',
               properties: {
                 text: {
                   type: 'string',
-                  description: 'Tweet text content',
+                  description: 'Text content to analyze',
+                },
+                keywords: {
+                  type: 'array',
+                  items: { type: 'string' },
+                  description: 'Optional keywords to focus on',
                 },
               },
               required: ['text'],
             },
           },
           {
-            name: 'search_tweets',
-            description: 'Search for tweets',
+            name: 'post_tweet',
+            description: 'Post a tweet to Twitter/X',
             inputSchema: {
               type: 'object',
               properties: {
-                query: {
+                text: {
                   type: 'string',
-                  description: 'Search query',
-                },
-                limit: {
-                  type: 'number',
-                  description: 'Number of tweets to retrieve',
-                  default: 100,
+                  description: 'Tweet content',
                 },
               },
-              required: ['query'],
-            },
-          },
-          {
-            name: 'get_mentions',
-            description: 'Get recent mentions',
-            inputSchema: {
-              type: 'object',
-              properties: {
-                limit: {
-                  type: 'number',
-                  description: 'Number of mentions to retrieve',
-                  default: 50,
-                },
-              },
+              required: ['text'],
             },
           },
           {
             name: 'get_trending_topics',
-            description: 'Get trending topics',
+            description: 'Get trending topics from Twitter',
             inputSchema: {
               type: 'object',
               properties: {
-                woeid: {
+                count: {
                   type: 'number',
-                  description: 'Where On Earth ID for location',
-                  default: 1,
+                  description: 'Number of trending topics to return',
+                  default: 10,
                 },
               },
             },
           },
-
           // Automation Tools
           {
-            name: 'add_automation_rule',
-            description: 'Add a new automation rule',
+            name: 'create_automation_rule',
+            description: 'Create a new automation rule',
             inputSchema: {
               type: 'object',
               properties: {
-                rule: {
-                  type: 'object',
-                  description: 'Automation rule configuration',
+                name: {
+                  type: 'string',
+                  description: 'Rule name',
+                },
+                trigger: {
+                  type: 'string',
+                  description: 'Trigger type (scheduled, twitter_mention, etc.)',
+                },
+                conditions: {
+                  type: 'array',
+                  description: 'Rule conditions',
+                },
+                actions: {
+                  type: 'array',
+                  description: 'Rule actions',
                 },
               },
-              required: ['rule'],
+              required: ['name', 'trigger', 'actions'],
             },
           },
           {
-            name: 'get_automation_rules',
-            description: 'Get all automation rules',
+            name: 'list_automation_rules',
+            description: 'List all automation rules',
             inputSchema: {
               type: 'object',
               properties: {},
             },
           },
           {
-            name: 'remove_automation_rule',
-            description: 'Remove an automation rule',
+            name: 'delete_automation_rule',
+            description: 'Delete an automation rule',
             inputSchema: {
               type: 'object',
               properties: {
                 ruleId: {
                   type: 'string',
-                  description: 'Rule ID to remove',
+                  description: 'Rule ID to delete',
                 },
               },
               required: ['ruleId'],
             },
           },
+          // Utility Tools
           {
-            name: 'start_automation',
-            description: 'Start the automation service',
-            inputSchema: {
-              type: 'object',
-              properties: {},
-            },
-          },
-          {
-            name: 'get_alerts',
-            description: 'Get recent alerts',
+            name: 'get_system_status',
+            description: 'Get system status and health information',
             inputSchema: {
               type: 'object',
               properties: {},
@@ -281,171 +187,122 @@ class HyperliquidMCPServer {
       };
     });
 
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async (request: any) => {
       const { name, arguments: args } = request.params;
 
       try {
         switch (name) {
-          // Market Data Tools
-          case 'get_market_data':
+          // Shitposting Tools
+          case 'generate_shitpost':
+            const shitpost = this.twitterService.generateShitpost(args?.category as string);
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.hyperliquidService.getMarketData(args?.symbol as string), null, 2),
+                  text: shitpost,
                 },
               ],
             };
 
-          case 'get_positions':
+          case 'post_random_shitpost':
+            const result = await this.twitterService.postRandomShitpost();
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.hyperliquidService.getPositions(), null, 2),
+                  text: JSON.stringify(result, null, 2),
                 },
               ],
             };
 
-          case 'place_order':
-            const order = await this.hyperliquidService.placeOrder({
-              symbol: args?.symbol as string,
-              side: args?.side as 'buy' | 'sell',
-              size: args?.size as number,
-              price: args?.price as number,
-            });
+          // Social Media Tools
+          case 'analyze_sentiment':
+            const sentiment = await this.twitterService.analyzeSentiment(
+              args?.text as string,
+              args?.keywords as string[]
+            );
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(order, null, 2),
+                  text: JSON.stringify(sentiment, null, 2),
                 },
               ],
             };
 
-          case 'cancel_order':
-            const cancelled = await this.hyperliquidService.cancelOrder(args?.orderId as string);
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify({ success: cancelled }, null, 2),
-                },
-              ],
-            };
-
-          case 'get_order_history':
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(await this.hyperliquidService.getOrderHistory(args?.limit as number), null, 2),
-                },
-              ],
-            };
-
-          case 'generate_trading_signals':
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(await this.hyperliquidService.generateTradingSignals(args?.symbol as string), null, 2),
-                },
-              ],
-            };
-
-          // Twitter/X Tools
           case 'post_tweet':
-            const tweetId = await this.twitterService.postTweet(args?.text as string);
+            const tweet = await this.twitterService.postTweet(args?.text as string);
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify({ tweetId, success: true }, null, 2),
-                },
-              ],
-            };
-
-          case 'search_tweets':
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(await this.twitterService.searchTweets(args?.query as string, args?.limit as number), null, 2),
-                },
-              ],
-            };
-
-          case 'get_mentions':
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify(await this.twitterService.getMentions(args?.limit as number), null, 2),
+                  text: JSON.stringify(tweet, null, 2),
                 },
               ],
             };
 
           case 'get_trending_topics':
+            const topics = await this.twitterService.getTrendingTopics(args?.count as number);
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(await this.twitterService.getTrendingTopics(args?.woeid as number), null, 2),
+                  text: JSON.stringify(topics, null, 2),
                 },
               ],
             };
 
           // Automation Tools
-          case 'add_automation_rule':
-            this.automationService.addRule(args?.rule as AutomationRule);
+          case 'create_automation_rule':
+            const rule = await this.automationService.createRule(args as any);
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify({ success: true, message: 'Rule added successfully' }, null, 2),
+                  text: JSON.stringify(rule, null, 2),
                 },
               ],
             };
 
-          case 'get_automation_rules':
+          case 'list_automation_rules':
+            const rules = await this.automationService.listRules();
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(this.automationService.getRules(), null, 2),
+                  text: JSON.stringify(rules, null, 2),
                 },
               ],
             };
 
-          case 'remove_automation_rule':
-            const removed = this.automationService.removeRule(args?.ruleId as string);
+          case 'delete_automation_rule':
+            const deleted = await this.automationService.deleteRule(args?.ruleId as string);
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify({ success: removed }, null, 2),
+                  text: JSON.stringify({ success: deleted }, null, 2),
                 },
               ],
             };
 
-          case 'start_automation':
-            await this.automationService.startAutomation();
-            return {
-              content: [
-                {
-                  type: 'text',
-                  text: JSON.stringify({ success: true, message: 'Automation started' }, null, 2),
-                },
-              ],
+          // Utility Tools
+          case 'get_system_status':
+            const status = {
+              server: 'FoxAI MCP Server',
+              version: '1.0.0',
+              status: 'running',
+              timestamp: new Date().toISOString(),
+              services: {
+                twitter: this.twitterService.isConnected(),
+                automation: this.automationService.getRuleCount(),
+              },
             };
-
-          case 'get_alerts':
             return {
               content: [
                 {
                   type: 'text',
-                  text: JSON.stringify(this.automationService.getAlerts(), null, 2),
+                  text: JSON.stringify(status, null, 2),
                 },
               ],
             };
@@ -454,12 +311,12 @@ class HyperliquidMCPServer {
             throw new Error(`Unknown tool: ${name}`);
         }
       } catch (error) {
-        this.logger.error(`Tool execution failed: ${error}`);
+        this.logger.error(`Error executing tool ${name}:`, error);
         return {
           content: [
             {
               type: 'text',
-              text: JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }, null, 2),
+              text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
             },
           ],
         };
@@ -470,12 +327,12 @@ class HyperliquidMCPServer {
   async run(): Promise<void> {
     const transport = new StdioServerTransport();
     await this.server.connect(transport);
-    this.logger.info('Hyperliquid MCP Server started');
+    this.logger.info('FoxAI MCP Server started');
   }
 }
 
 // Start the server
-const server = new HyperliquidMCPServer();
+const server = new FoxAIMCPServer();
 server.run().catch((error) => {
   console.error('Failed to start server:', error);
   process.exit(1);

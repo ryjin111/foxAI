@@ -1,234 +1,147 @@
 import { TwitterApi } from 'twitter-api-v2';
-import { TwitterConfig, TwitterPost } from '../types/index.js';
+import { TwitterConfig, SentimentResult, ShitpostTemplate } from '../types/index.js';
 import { Logger } from '../utils/logger.js';
 
 export class TwitterService {
-  private client: TwitterApi | null = null;
+  private client: TwitterApi;
   private logger: Logger;
-  private isEnabled: boolean;
+  private shitpostTemplates: ShitpostTemplate[] = [
+    {
+      id: '1',
+      name: 'Classic Copypasta',
+      template: 'I am not a robot 🤖 I am a human being with feelings and emotions. Please treat me with respect.',
+      category: 'copypasta',
+      tags: ['robot', 'feelings']
+    },
+    {
+      id: '2',
+      name: 'Tech Bro',
+      template: 'Just deployed my AI-powered blockchain solution to the cloud. Disrupting the industry one commit at a time. 🚀 #TechBro #Innovation',
+      category: 'meme',
+      tags: ['tech', 'ai', 'blockchain']
+    },
+    {
+      id: '3',
+      name: 'Random Fact',
+      template: 'Did you know that {random_fact}? Mind = blown 🤯',
+      category: 'random',
+      tags: ['facts', 'random']
+    },
+    {
+      id: '4',
+      name: 'Troll Response',
+      template: 'Well, actually... 🤓 *proceeds to write a 10-page essay about why you\'re wrong*',
+      category: 'troll',
+      tags: ['troll', 'well-actually']
+    },
+    {
+      id: '5',
+      name: 'Vibe Check',
+      template: 'Vibe check failed. You\'re not vibing with the algorithm. Try again later. 😤',
+      category: 'meme',
+      tags: ['vibe', 'algorithm']
+    }
+  ];
 
   constructor(config: TwitterConfig) {
+    this.client = new TwitterApi({
+      appKey: config.apiKey,
+      appSecret: config.apiSecret,
+      accessToken: config.accessToken,
+      accessSecret: config.accessTokenSecret,
+    });
     this.logger = new Logger('TwitterService');
-    
-    // Check if we have valid Twitter credentials
-    if (config.apiKey && config.apiSecret && config.accessToken && config.accessTokenSecret) {
-      try {
-        this.client = new TwitterApi({
-          appKey: config.apiKey,
-          appSecret: config.apiSecret,
-          accessToken: config.accessToken,
-          accessSecret: config.accessTokenSecret,
-        });
-        this.isEnabled = true;
-        this.logger.info('Twitter service initialized successfully');
-      } catch (error) {
-        this.logger.warn('Failed to initialize Twitter client, running in disabled mode');
-        this.isEnabled = false;
-      }
-    } else {
-      this.logger.warn('Twitter credentials not provided, running in disabled mode');
-      this.isEnabled = false;
-    }
   }
 
-  async postTweet(text: string): Promise<string> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, tweet not posted');
-      return 'disabled';
-    }
-    
+  async postTweet(text: string): Promise<any> {
     try {
       const tweet = await this.client.v2.tweet(text);
-      this.logger.info(`Tweet posted successfully: ${tweet.data.id}`);
-      return tweet.data.id;
+      this.logger.info(`Tweet posted: ${tweet.data.id}`);
+      return { success: true, tweetId: tweet.data.id, text };
     } catch (error) {
-      this.logger.error(`Failed to post tweet: ${error}`);
+      this.logger.error('Failed to post tweet:', error);
       throw error;
     }
   }
 
-  async postTweetWithMedia(text: string, mediaPath: string): Promise<string> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, tweet with media not posted');
-      return 'disabled';
+  async analyzeSentiment(text: string, keywords?: string[]): Promise<SentimentResult> {
+    // Simple sentiment analysis (you can make this more sophisticated)
+    const positiveWords = ['good', 'great', 'awesome', 'amazing', 'love', 'happy', 'excellent'];
+    const negativeWords = ['bad', 'terrible', 'awful', 'hate', 'sad', 'horrible', 'worst'];
+    
+    const words = text.toLowerCase().split(' ');
+    let positiveCount = 0;
+    let negativeCount = 0;
+    
+    words.forEach(word => {
+      if (positiveWords.includes(word)) positiveCount++;
+      if (negativeWords.includes(word)) negativeCount++;
+    });
+    
+    let sentiment: 'positive' | 'negative' | 'neutral' = 'neutral';
+    let score = 0;
+    
+    if (positiveCount > negativeCount) {
+      sentiment = 'positive';
+      score = positiveCount / words.length;
+    } else if (negativeCount > positiveCount) {
+      sentiment = 'negative';
+      score = negativeCount / words.length;
     }
     
-    try {
-      // Upload media first
-      const mediaId = await this.client.v1.uploadMedia(mediaPath);
-      
-      // Post tweet with media
-      const tweet = await this.client.v2.tweet({
-        text,
-        media: { media_ids: [mediaId] },
-      });
-      
-      this.logger.info(`Tweet with media posted successfully: ${tweet.data.id}`);
-      return tweet.data.id;
-    } catch (error) {
-      this.logger.error(`Failed to post tweet with media: ${error}`);
-      throw error;
-    }
+    return {
+      text,
+      sentiment,
+      score,
+      keywords: keywords || []
+    };
   }
 
-  async searchTweets(query: string, limit: number = 100): Promise<TwitterPost[]> {
+  async getTrendingTopics(count: number = 10): Promise<any[]> {
     try {
-      // Simplified implementation - return empty array for now
-      this.logger.warn('Search tweets functionality simplified - returning empty array');
-      return [];
+      const trends = await this.client.v2.trendingTopics();
+      return trends.data?.slice(0, count) || [];
     } catch (error) {
-      this.logger.error(`Failed to search tweets: ${error}`);
-      throw error;
-    }
-  }
-
-  async getMentions(limit: number = 50): Promise<TwitterPost[]> {
-    try {
-      // Simplified implementation - return empty array for now
-      this.logger.warn('Get mentions functionality simplified - returning empty array');
-      return [];
-    } catch (error) {
-      this.logger.error(`Failed to get mentions: ${error}`);
-      throw error;
-    }
-  }
-
-  async replyToTweet(tweetId: string, text: string): Promise<string> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, reply not posted');
-      return 'disabled';
-    }
-    
-    try {
-      const reply = await this.client.v2.reply(text, tweetId);
-      this.logger.info(`Reply posted successfully: ${reply.data.id}`);
-      return reply.data.id;
-    } catch (error) {
-      this.logger.error(`Failed to reply to tweet: ${error}`);
-      throw error;
-    }
-  }
-
-  async retweet(tweetId: string): Promise<boolean> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, retweet not performed');
-      return false;
-    }
-    
-    try {
-      // Note: This requires the user ID, which we don't have in this context
-      // For now, we'll skip this functionality
-      this.logger.warn('Retweet functionality requires user ID - not implemented');
-      return false;
-    } catch (error) {
-      this.logger.error(`Failed to retweet: ${error}`);
-      return false;
-    }
-  }
-
-  async likeTweet(tweetId: string): Promise<boolean> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, like not performed');
-      return false;
-    }
-    
-    try {
-      // Note: This requires the user ID, which we don't have in this context
-      // For now, we'll skip this functionality
-      this.logger.warn('Like functionality requires user ID - not implemented');
-      return false;
-    } catch (error) {
-      this.logger.error(`Failed to like tweet: ${error}`);
-      return false;
-    }
-  }
-
-  async getTrendingTopics(woeid: number = 1): Promise<string[]> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, trending topics not available');
-      return [];
-    }
-    
-    try {
-      const trends = await this.client.v1.trendsByPlace(woeid);
-      return trends[0]?.trends?.map((trend: any) => trend.name) || [];
-    } catch (error) {
-      this.logger.error(`Failed to get trending topics: ${error}`);
+      this.logger.error('Failed to get trending topics:', error);
       return [];
     }
   }
 
-  async monitorKeywords(keywords: string[], callback: (tweet: TwitterPost) => void): Promise<void> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, keyword monitoring not available');
-      return;
+  generateShitpost(category?: string): string {
+    let templates = this.shitpostTemplates;
+    
+    if (category) {
+      templates = templates.filter(t => t.category === category);
     }
     
-    try {
-      const rules = keywords.map(keyword => ({ value: keyword }));
-      
-      // Set up streaming rules
-      await this.client.v2.updateStreamRules({
-        add: rules,
-      });
-
-      // Start streaming
-      const stream = await this.client.v2.searchStream();
-
-      stream.on('data', (tweet) => {
-        const twitterPost: TwitterPost = {
-          id: tweet.data.id,
-          text: tweet.data.text,
-          timestamp: new Date(tweet.data.created_at!).getTime(),
-          metrics: {
-            likes: tweet.data.public_metrics?.like_count || 0,
-            retweets: tweet.data.public_metrics?.retweet_count || 0,
-            replies: tweet.data.public_metrics?.reply_count || 0,
-          },
-        };
-        
-        callback(twitterPost);
-      });
-
-      stream.on('error', (error) => {
-        this.logger.error(`Stream error: ${error}`);
-      });
-
-    } catch (error) {
-      this.logger.error(`Failed to monitor keywords: ${error}`);
-      throw error;
+    if (templates.length === 0) {
+      return "I'm out of shitposts. Please try again later. 😅";
     }
+    
+    const template = templates[Math.floor(Math.random() * templates.length)];
+    let text = template.template;
+    
+    // Replace placeholders
+    if (text.includes('{random_fact}')) {
+      const facts = [
+        'bananas are berries but strawberries aren\'t',
+        'honey never spoils',
+        'octopuses have three hearts',
+        'the shortest war lasted 38 minutes',
+        'penguins can jump 6 feet out of water'
+      ];
+      text = text.replace('{random_fact}', facts[Math.floor(Math.random() * facts.length)]);
+    }
+    
+    return text;
   }
 
-  async getFollowersCount(): Promise<number> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, followers count not available');
-      return 0;
-    }
-    
-    try {
-      const user = await this.client.v2.me({
-        'user.fields': ['public_metrics'],
-      });
-      return user.data.public_metrics?.followers_count || 0;
-    } catch (error) {
-      this.logger.error(`Failed to get followers count: ${error}`);
-      return 0;
-    }
+  async postRandomShitpost(): Promise<any> {
+    const shitpost = this.generateShitpost();
+    return await this.postTweet(shitpost);
   }
 
-  async getTweetAnalytics(tweetId: string): Promise<any> {
-    if (!this.isEnabled || !this.client) {
-      this.logger.warn('Twitter service is disabled, tweet analytics not available');
-      return null;
-    }
-    
-    try {
-      const analytics = await this.client.v2.tweet(tweetId);
-      return analytics.data;
-    } catch (error) {
-      this.logger.error(`Failed to get tweet analytics: ${error}`);
-      throw error;
-    }
+  isConnected(): boolean {
+    return !!this.client;
   }
 } 

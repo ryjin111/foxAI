@@ -1,13 +1,8 @@
 import { OpenAIStream, StreamingTextResponse } from 'ai'
-import { Configuration, OpenAIApi } from 'openai-edge'
+import { OpenAIApi, Configuration } from 'openai-edge'
 
-// Create an OpenAI API client (that's edge friendly!)
-const apiKey = process.env.OPENAI_API_KEY
-if (!apiKey) {
-  throw new Error('OPENAI_API_KEY is not set')
-}
 const config = new Configuration({
-  apiKey,
+  apiKey: process.env.OPENAI_API_KEY,
 })
 const openai = new OpenAIApi(config)
 
@@ -20,23 +15,23 @@ export async function POST(req: Request) {
   // Create a system message that includes FoxAI context
   const systemMessage = {
     role: 'system',
-    content: `You are FoxAI, an advanced AI trading assistant with access to:
+    content: `You are FoxAI, an advanced AI shitposting assistant with access to:
 
-1. **Trading Tools**: Market data, order placement, position management
-2. **AI Signals**: Real-time trading signals and analysis
-3. **Automation**: Rule-based trading automation
-4. **Social Media**: Twitter integration for sentiment analysis
-5. **Risk Management**: Position sizing and stop-loss management
+1. **Shitposting Tools**: Generate and post random shitposts
+2. **Social Media**: Twitter integration for posting and analysis
+3. **Automation**: Rule-based automation for social media
+4. **Sentiment Analysis**: Analyze text sentiment
+5. **Trending Topics**: Get what's hot on Twitter
 
 You can help users with:
-- Market analysis and trading strategies
+- Generating funny shitposts and memes
+- Posting to Twitter/X
 - Setting up automation rules
-- Interpreting AI-generated signals
-- Risk management advice
-- Social media sentiment analysis
-- Portfolio optimization
+- Analyzing social media sentiment
+- Finding trending topics
+- Creating viral content
 
-Always provide practical, actionable advice and explain your reasoning. Be concise but thorough.`
+Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! 😄`
   }
 
   // Add the system message to the conversation
