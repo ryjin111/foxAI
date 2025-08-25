@@ -157,15 +157,23 @@ export class TwitterService {
 
       const replies = [];
       
-      for (const mention of mentions.data || []) {
-        const reply = await this.generateMentionReply(mention.text);
-        if (reply) {
-          const tweetReply = await this.client.v2.reply(reply, mention.id);
-          replies.push({
-            originalTweetId: mention.id,
-            replyId: tweetReply.data.id,
-            reply: reply
-          });
+      // Handle paginated results properly
+      if (mentions && mentions.data && Array.isArray(mentions.data) && mentions.data.length > 0) {
+        for (const mention of mentions.data) {
+          try {
+            const reply = await this.generateMentionReply(mention.text);
+            if (reply) {
+              const tweetReply = await this.client.v2.reply(reply, mention.id);
+              replies.push({
+                originalTweetId: mention.id,
+                replyId: tweetReply.data.id,
+                reply: reply
+              });
+            }
+          } catch (mentionError) {
+            this.logger.error(`Failed to process mention ${mention.id}:`, mentionError);
+            // Continue with other mentions
+          }
         }
       }
 
