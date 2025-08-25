@@ -1,6 +1,9 @@
 // IMPORTANT! Set the runtime to edge
 export const runtime = 'edge'
 
+// MCP Server connection
+const MCP_SERVER_URL = process.env.MCP_SERVER_URL || 'http://localhost:3001'
+
 export async function POST(req: Request) {
   const { messages } = await req.json()
 
@@ -37,6 +40,75 @@ export async function POST(req: Request) {
     })
   }
 
+  // Check if user wants to post to Twitter
+  const lastMessage = messages[messages.length - 1]?.content?.toLowerCase() || ''
+  const isTwitterRequest = lastMessage.includes('post') && (lastMessage.includes('twitter') || lastMessage.includes('x') || lastMessage.includes('tweet'))
+
+  if (isTwitterRequest) {
+    try {
+      // Generate a shitpost first
+      const shitpostResponse = await fetch('https://api.deepseek.com/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'deepseek-chat',
+          messages: [
+            {
+              role: 'system',
+              content: 'Generate a funny, viral shitpost about crypto, tech, or AI. Keep it under 280 characters. Make it engaging and shareable.'
+            },
+            {
+              role: 'user',
+              content: 'Generate a random shitpost'
+            }
+          ],
+          stream: false,
+          temperature: 0.8,
+          max_tokens: 200,
+        }),
+      })
+
+      if (shitpostResponse.ok) {
+        const shitpostData = await shitpostResponse.json()
+        const shitpost = shitpostData.choices?.[0]?.message?.content || "🚀 Just deployed my AI-powered blockchain solution! Disrupting the industry one commit at a time! #TechBro #Innovation"
+
+        // Post to Twitter via MCP
+        const mcpResponse = await fetch(`${MCP_SERVER_URL}/api/tools`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: 'post_tweet',
+            arguments: { text: shitpost },
+          }),
+        })
+
+        if (mcpResponse.ok) {
+          const result = await mcpResponse.json()
+          return new Response(`🐦 Posted to Twitter/X: "${shitpost}"\n\nStatus: ${result.success ? 'Success!' : 'Failed'}`, {
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+              'Cache-Control': 'no-cache',
+            },
+          })
+        } else {
+          return new Response(`🐦 Generated tweet: "${shitpost}"\n\nNote: Twitter posting failed (MCP server not running)`, {
+            headers: {
+              'Content-Type': 'text/plain; charset=utf-8',
+              'Cache-Control': 'no-cache',
+            },
+          })
+        }
+      }
+    } catch (error) {
+      console.error('Twitter posting error:', error)
+    }
+  }
+
   // Create a system message that includes FoxAI context
   const systemMessage = {
     role: 'system',
@@ -51,14 +123,16 @@ export async function POST(req: Request) {
 
 You can help users with:
 - Generating funny shitposts and memes
-- Posting to Twitter/X
+- Posting to Twitter/X (I can actually post for you!)
 - Setting up automation rules
 - Analyzing social media sentiment
 - Finding trending topics
 - Creating viral content
 - Crypto market insights and shitposts
 
-Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! 😄`
+Keep responses fun, casual, and engaging. Don't be afraid to be a bit silly! 😄
+
+IMPORTANT: When users ask to post to Twitter/X, I can actually do it! Just say "post to twitter" or "post to x" and I'll generate and post a shitpost for you.`
   }
 
   // Add the system message to the conversation
