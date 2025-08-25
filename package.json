@@ -13,9 +13,7 @@
     "next:dev": "next dev",
     "next:build": "next build",
     "next:start": "next start",
-    "test": "jest",
-    "agent:dev": "tsx src/autonomous-agent.ts",
-    "agent:start": "node dist/autonomous-agent.js"
+    "test": "jest"
   },
   "keywords": [
     "ai",
@@ -50,8 +48,7 @@
     "lucide-react": "^0.294.0",
     "tailwind-merge": "^2.0.0",
     "tailwindcss": "^3.3.0",
-    "tailwindcss-animate": "^1.0.0",
-    "node-cron": "^3.0.3"
+    "tailwindcss-animate": "^1.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.0",

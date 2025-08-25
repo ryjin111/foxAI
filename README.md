@@ -1,15 +1,15 @@
 # 🦊 FoxAI - Advanced Crypto Analysis & Autonomous AI Agent
 
-**AI-powered crypto analysis, market intelligence, and autonomous social media management with real-time insights, trend detection, and 24/7 autonomous operation.**
+**AI-powered crypto analysis, market intelligence, and autonomous social media management with real-time insights, trend detection, and 24/7 autonomous operation via Vercel cron jobs.**
 
 ## 🚀 Features
 
-### **🤖 Autonomous AI Agent**
-- **24/7 Autonomous Operation** - Runs continuously without human intervention
-- **Persistent Memory** - Learns from interactions and market patterns
-- **Multi-step Workflows** - Complex operations through natural language
-- **Scheduled Automation** - Cron-based task scheduling
+### **🤖 Autonomous AI Agent (Vercel Cron Jobs)**
+- **24/7 Autonomous Operation** - Runs continuously via Vercel cron jobs
+- **Scheduled Automation** - Automated workflows at specific intervals
+- **Multi-step Workflows** - Complex operations through API endpoints
 - **Real-world Actions** - Takes actions through integrated services
+- **No Server Maintenance** - Fully managed by Vercel infrastructure
 
 ### **Core Capabilities**
 - 🤖 **AI-Powered Analysis** - DeepSeek AI integration for intelligent insights
@@ -64,6 +64,9 @@ COINGECKO_API_KEY=your_coingecko_api_key
 
 # MCP Server
 MCP_SERVER_URL=http://localhost:3001
+
+# Vercel Cron Jobs (Optional - for security)
+CRON_SECRET=your_cron_secret_key
 ```
 
 ### **Local Development**
@@ -74,9 +77,6 @@ npm install
 
 # Start MCP server
 npm run dev
-
-# Start autonomous agent
-npm run agent:dev
 
 # Start Next.js app
 npm run next:dev
@@ -91,44 +91,47 @@ FoxAI is an autonomous AI agent specialized in Hyperliquid EVM analysis and NFT 
 - **Bullish on Hyperliquid EVM** - Always optimistic about cross-chain trading
 - **Community engagement** - Loves sharing insights and building community
 
-### **Autonomous Workflows**
+### **Autonomous Workflows (Vercel Cron Jobs)**
 
 #### **1. Hourly Market Updates**
 - **Schedule:** Every hour at the top of the hour
+- **Endpoint:** `/api/cron/hourly-market-update`
 - **Actions:** Fetch data → Analyze sentiment → Generate content → Post to Twitter
 - **Output:** Engaging Hyperliquid EVM market updates
 
 #### **2. Mention Monitoring**
 - **Schedule:** Every 5 minutes
+- **Endpoint:** `/api/cron/mention-monitoring`
 - **Actions:** Check mentions → Analyze sentiment → Generate replies → Reply to mentions
 - **Output:** Smart, context-aware responses
 
 #### **3. NFT Collection Monitoring**
 - **Schedule:** Every 15 minutes
+- **Endpoint:** `/api/cron/nft-monitoring`
 - **Actions:** Fetch NFT data → Analyze performance → Identify opportunities
 - **Output:** Real-time NFT insights and trading opportunities
 
 #### **4. Daily Market Intelligence Report**
 - **Schedule:** Every day at 9 AM
+- **Endpoint:** `/api/cron/daily-report`
 - **Actions:** Gather comprehensive data → Generate report → Post analysis
 - **Output:** Daily market intelligence and insights
 
 ### **Agent Commands**
 ```bash
-# Start autonomous agent
-npm run agent:dev
+# Get agent status
+curl -X GET https://your-app.vercel.app/api/eliza
 
 # Send message to agent
-curl -X POST /api/eliza \
+curl -X POST https://your-app.vercel.app/api/eliza \
   -H "Content-Type: application/json" \
   -d '{"action": "send_message", "message": "Analyze current Hyperliquid EVM market"}'
 
-# Get agent status
-curl -X GET /api/eliza
-
-# Start/stop agent
-curl -X POST /api/eliza -d '{"action": "start"}'
-curl -X POST /api/eliza -d '{"action": "stop"}'
+# Manual trigger cron jobs
+curl -X GET https://your-app.vercel.app/api/cron/hourly-market-update
+curl -X GET https://your-app.vercel.app/api/cron/mention-monitoring
+curl -X GET https://your-app.vercel.app/api/cron/nft-monitoring
+curl -X GET https://your-app.vercel.app/api/cron/daily-report
 ```
 
 ## 🧠 MCP Server Tools
@@ -275,4 +278,4 @@ MIT License - see LICENSE file for details
 
 **🦊 FoxAI - Your autonomous AI-powered crypto analysis and Hyperliquid EVM specialist!** 🚀
 
-*Powered by advanced autonomous agent technology* 
+*Powered by Vercel cron jobs for 24/7 autonomous operation* 
