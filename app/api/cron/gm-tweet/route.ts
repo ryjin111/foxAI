@@ -3,13 +3,13 @@ import { FoxyTwitterClient } from '@/lib/twitter';
 import { accessCodeManager } from '@/lib/access-codes-override';
 import { shinZDB } from '@/lib/database';
 
-// GM tweet templates with variations (dynamic, no static prices)
+// GM tweet templates with AIXBT-style shitposting
 const GM_TWEET_TEMPLATES = [
-  "🦊 GM Fox Fam! OnChain Hyper Foxes building on @hyperliquidX - the fastest L1 in crypto 🚀",
-  "🦊 GM @hyperliquidX! OnChain Hyper Foxes leading the ecosystem. Chads accumulating while normies sleep 💎",
-  "🦊 GM Fox Holders! Building strong on @hyperliquidX - where real alpha lives 🔥",
-  "🦊 GM! Another day, another fox W on @hyperliquidX. Paper hands fold, diamond hands accumulate 📈",
-  "🦊 GM @hyperliquidX EVM! Fox community built different. Smart money knows where the future is 🌟"
+  "🦊 GM anons. OnChain Hyper Foxes on @hyperliquidX while you're still coping with ETH gas fees. ngmi",
+  "🦊 GM @hyperliquidX. Fox holders stay winning while normies seethe about their mid collections. cope harder",
+  "🦊 GM chads. @hyperliquidX ecosystem printing while other L1s bleed users. Fox holders know alpha when they see it",
+  "🦊 GM. Another day of fox superiority on @hyperliquidX. Paper hands folded, diamond hands accumulated. hfsp normies",
+  "🦊 GM @hyperliquidX builders. Fox community built different while other NFT projects stay ngmi. based ecosystem"
 ];
 
 export async function GET(req: NextRequest) {
