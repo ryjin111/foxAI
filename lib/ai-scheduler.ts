@@ -1,7 +1,8 @@
-// AI-Powered Scheduler for SeishinZ Agent
+// AI-Powered Scheduler for Foxy Agent
 import { shinZDB } from './database';
-import { SeishinZTwitterClient, MentionsResult } from './twitter';
+import { FoxyTwitterClient, MentionsResult } from './twitter';
 import { accessCodeManager } from './access-codes';
+import { dripTradeClient } from './drip-trade-client';
 
 export interface ScheduledTask {
   id: string;
@@ -174,7 +175,7 @@ export class AIScheduler {
   }
 
   private async executeGmTweet(): Promise<void> {
-    const twitterClient = new SeishinZTwitterClient();
+    const twitterClient = new FoxyTwitterClient();
     
     // Check if already posted today
     const today = new Date().toDateString();
@@ -185,13 +186,13 @@ export class AIScheduler {
       return;
     }
 
-    // GM tweet templates
+    // GM tweet templates (dynamic, no static prices)
     const templates = [
-      "GM Shapers @ShapeL2. Morning check-in. Explore seishinz.xyz for fresh drops and updates.",
-      "GM @ShapeL2 Shapers. New day, new alpha. See what's moving at seishinz.xyz.",
-      "GM Shapers @ShapeL2. Time to scan the market. Highlights updated on seishinz.xyz.",
-      "GM @ShapeL2. Good morning. Keep an eye on new collections at seishinz.xyz.",
-      "GM Shapers @ShapeL2. Rise and build. Daily updates live on seishinz.xyz."
+      "🦊 GM Fox Fam! Rare traits moving, alpha hunters stay ready. Check Drip.Trade for current floors",
+      "🦊 GM Hyperliquid! OnChain Hyper Foxes leading the ecosystem. Chads accumulating while normies sleep",
+      "🦊 GM Fox Holders! Effects and Ki traits where the alpha is. Time to hunt on the fastest L1",
+      "🦊 GM! Another day, another fox W. Paper hands fold, diamond hands accumulate rare traits",
+      "🦊 GM Hyperliquid EVM! Fox community built different. Smart money knows where to look"
     ];
 
     const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
@@ -210,23 +211,23 @@ export class AIScheduler {
   }
 
   private async executeGasbackUpdate(): Promise<void> {
-    // AI will generate gasback update content
-    const content = "🔥 **Gasback Rewards Update** 🔥\n\nLatest rewards are live on Shape Network! Stack those points and earn rewards.\n\nCheck your rewards at seishinz.xyz 🎯\n\n#ShapeNetwork #Gasback";
+    // Generate dynamic fox floor update content (no static prices)
+    const content = dripTradeClient.getDynamicTweetContent('floor');
     
-    const twitterClient = new SeishinZTwitterClient();
+    const twitterClient = new FoxyTwitterClient();
     await twitterClient.postTweet(content);
   }
 
   private async executeNftUpdate(): Promise<void> {
-    // AI will generate NFT update content
-    const content = "🎨 **NFT Collection Update** 🎨\n\nLatest floor movements and volume spikes on Shape Network!\n\nDiscover trending collections at seishinz.xyz 📊\n\n#NFTs #ShapeNetwork";
+    // Generate dynamic rare trait alert content
+    const content = dripTradeClient.getDynamicTweetContent('traits');
     
-    const twitterClient = new SeishinZTwitterClient();
+    const twitterClient = new FoxyTwitterClient();
     await twitterClient.postTweet(content);
   }
 
   private async executeCommunityEngagement(): Promise<void> {
-    const twitterClient = new SeishinZTwitterClient();
+    const twitterClient = new FoxyTwitterClient();
     const mentions: MentionsResult = await twitterClient.getMentions();
     
     const mentionList: any[] = (mentions.mentions as any[]) ?? [];
@@ -235,7 +236,7 @@ export class AIScheduler {
       const recentMentions = mentionList.slice(0, 3);
       
       for (const mention of recentMentions) {
-        const reply = `Thanks for the mention! 🙏 Check out seishinz.xyz for the latest updates! 🚀`;
+        const reply = `Thanks for the mention! 🦊 OnChain Hyper Foxes staying strong on Hyperliquid EVM! 🚀`;
         await twitterClient.replyToTweet(mention.id, reply);
       }
     }

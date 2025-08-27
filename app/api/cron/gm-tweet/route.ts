@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SeishinZTwitterClient } from '@/lib/twitter';
+import { FoxyTwitterClient } from '@/lib/twitter';
 import { accessCodeManager } from '@/lib/access-codes';
 import { shinZDB } from '@/lib/database';
 
-// GM tweet templates with variations
+// GM tweet templates with variations (dynamic, no static prices)
 const GM_TWEET_TEMPLATES = [
-  "GM Shapers @ShapeL2. Morning check-in. Explore seishinz.xyz for fresh drops and updates.",
-  "GM @ShapeL2 Shapers. New day, new alpha. See what's moving at seishinz.xyz.",
-  "GM Shapers @ShapeL2. Time to scan the market. Highlights updated on seishinz.xyz.",
-  "GM @ShapeL2. Good morning. Keep an eye on new collections at seishinz.xyz.",
-  "GM Shapers @ShapeL2. Rise and build. Daily updates live on seishinz.xyz."
+  "🦊 GM Fox Fam! Rare traits moving, alpha hunters stay ready. Check Drip.Trade for current floors",
+  "🦊 GM Hyperliquid! OnChain Hyper Foxes leading the ecosystem. Chads accumulating while normies sleep",
+  "🦊 GM Fox Holders! Effects and Ki traits where the alpha is. Time to hunt on the fastest L1",
+  "🦊 GM! Another day, another fox W. Paper hands fold, diamond hands accumulate rare traits",
+  "🦊 GM Hyperliquid EVM! Fox community built different. Smart money knows where to look"
 ];
 
 export async function GET(req: NextRequest) {
@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
     const randomTemplate = GM_TWEET_TEMPLATES[Math.floor(Math.random() * GM_TWEET_TEMPLATES.length)];
     
     // Initialize Twitter client
-    const twitterClient = new SeishinZTwitterClient();
+    const twitterClient = new FoxyTwitterClient();
     
     // Post the GM tweet
     const result = await twitterClient.postTweet(randomTemplate);
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
     const randomTemplate = GM_TWEET_TEMPLATES[Math.floor(Math.random() * GM_TWEET_TEMPLATES.length)];
     
     // Initialize Twitter client
-    const twitterClient = new SeishinZTwitterClient();
+    const twitterClient = new FoxyTwitterClient();
     
     // Post the GM tweet
     const result = await twitterClient.postTweet(randomTemplate);
