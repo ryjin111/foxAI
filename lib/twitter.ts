@@ -11,12 +11,29 @@ export class FoxyTwitterClient {
   private client: TwitterApi;
 
   constructor() {
+    // Check if all required environment variables are present
+    const requiredEnvVars = {
+      appKey: process.env.TWITTER_API_KEY,
+      appSecret: process.env.TWITTER_API_SECRET,
+      accessToken: process.env.TWITTER_ACCESS_TOKEN,
+      accessSecret: process.env.TWITTER_ACCESS_SECRET,
+    };
+
+    // Log missing environment variables
+    const missing = Object.entries(requiredEnvVars).filter(([key, value]) => !value).map(([key]) => key);
+    if (missing.length > 0) {
+      console.error('Missing Twitter environment variables:', missing);
+      throw new Error(`Missing Twitter environment variables: ${missing.join(', ')}`);
+    }
+
     this.client = new TwitterApi({
-      appKey: process.env.TWITTER_API_KEY!,
-      appSecret: process.env.TWITTER_API_SECRET!,
-      accessToken: process.env.TWITTER_ACCESS_TOKEN!,
-      accessSecret: process.env.TWITTER_ACCESS_SECRET!,
+      appKey: requiredEnvVars.appKey!,
+      appSecret: requiredEnvVars.appSecret!,
+      accessToken: requiredEnvVars.accessToken!,
+      accessSecret: requiredEnvVars.accessSecret!,
     });
+    
+    console.log('Twitter client initialized successfully');
   }
 
   // Post a tweet
