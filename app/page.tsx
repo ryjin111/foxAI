@@ -70,7 +70,7 @@ export default function OnChainHyperFoxesAgent() {
         },
         body: JSON.stringify({
           messages: [...messages, userMessage],
-          accessCode: accessCodeManager.getCurrentAccessCode()?.code || '',
+          accessCode: 'FOXY_ACTIVE', // Foxy always has access
         }),
       });
 
@@ -317,35 +317,16 @@ export default function OnChainHyperFoxesAgent() {
   // Access code system removed - no authentication needed
 
   const getAccessStatus = () => {
-    const currentAccess = accessCodeManager.getCurrentAccessCode();
-    const usageStats = accessCodeManager.getUsageStats();
-    
-    // Check for admin bypass first
-    if (accessCodeManager.isAdminBypassEnabled()) {
-      return { status: 'Admin Bypass', color: 'text-purple-500', icon: Crown };
-    }
-    
-    if (!currentAccess) {
-      return { status: 'No Access', color: 'text-red-500', icon: Shield };
-    }
-    
-    switch (currentAccess.type) {
-      case 'nft_holder':
-        return { status: 'NFT Holder', color: 'text-green-500', icon: Crown };
-      case 'admin':
-        return { status: 'Admin', color: 'text-purple-500', icon: Crown };
-      case 'viewer':
-        return { status: 'Viewer', color: 'text-blue-500', icon: Eye };
-      case 'restricted':
-        return { status: 'Guest', color: 'text-yellow-500', icon: Shield };
-      default:
-        return { status: 'Unknown', color: 'text-gray-500', icon: Shield };
-    }
+    // Foxy is always active - no access restrictions
+    return { 
+      status: 'Foxy Active', 
+      color: 'text-green-500',
+      icon: Crown
+    };
   };
 
-  const AccessStatusDisplay = ({ onShowModal }: { onShowModal: () => void }) => {
+  const AccessStatusDisplay = () => {
     const accessStatus = getAccessStatus();
-    const usageStats = accessCodeManager.getUsageStats();
     const StatusIcon = accessStatus.icon;
     
     return (
@@ -356,22 +337,9 @@ export default function OnChainHyperFoxesAgent() {
             {accessStatus.status}
           </span>
         </div>
-        {usageStats.accessCode !== 'None' && (
-          <div className="text-xs text-gray-500 space-y-1">
-            <div>Tweets: {usageStats.tweetsPosted}/{usageStats.accessCode === 'ADMIN2024' ? '∞' : usageStats.remainingTweets + usageStats.tweetsPosted}</div>
-            <div>Replies: {usageStats.repliesSent}/{usageStats.accessCode === 'ADMIN2024' ? '∞' : usageStats.remainingReplies + usageStats.repliesSent}</div>
-          </div>
-        )}
-        {usageStats.accessCode === 'None' && (
-          <button
-            onClick={onShowModal}
-            className="w-full text-xs text-blue-600 hover:text-blue-800 transition-colors"
-          >
-            Enter Access Code
-          </button>
-        )}
-        
-
+        <div className="text-xs text-gray-500">
+          <div>Unlimited tweets & replies</div>
+        </div>
       </div>
     );
   };
@@ -445,9 +413,7 @@ export default function OnChainHyperFoxesAgent() {
 
           {/* Access Status */}
           <div className="p-4 border-t border-gray-200">
-            <AccessStatusDisplay 
-              onShowModal={() => setShowAccessModal(true)}
-            />
+            <AccessStatusDisplay />
           </div>
         </div>
 
