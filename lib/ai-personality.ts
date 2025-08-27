@@ -372,4 +372,7 @@ Your goal is to manage the ShinZ X account with NFT-focused personality - bold, 
         return this.generateGreeting();
     }
   }
-} 
+}
+
+// Export for backward compatibility with existing components
+export const SEISHINZ_PERSONALITY = FOX_PERSONALITY; 

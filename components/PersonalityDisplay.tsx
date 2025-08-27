@@ -23,7 +23,7 @@ export default function PersonalityDisplay() {
         <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
           <Brain className="w-4 h-4 text-white" />
         </div>
-        <h3 className="text-lg font-semibold">SeishinZ AI Personality</h3>
+        <h3 className="text-lg font-semibold">Foxy AI Personality</h3>
       </div>
 
       {/* Personality Overview */}

@@ -374,7 +374,7 @@ export async function POST(req: NextRequest) {
                 // Strip hashtags and emojis to keep a clean, human tone
                 tweetContent = tweetContent
                   .replace(/#\w+/g, '')
-                  .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
+                  .replace(/[\u1F300-\u1FAFF]/g, '')
                   .replace(/\s+/g, ' ')
                   .trim();
                 
