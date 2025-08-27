@@ -237,15 +237,7 @@ export async function POST(req: NextRequest) {
 
     // Create Hyperliquid EVM tools
     const hyperliquidTools = [
-      {
-        name: 'get_fox_floor_price',
-        description: 'Get OnChain Hyper Foxes floor price and collection stats from Drip.Trade',
-        inputSchema: {
-          type: 'object',
-          properties: {},
-          required: []
-        }
-      },
+
       {
         name: 'get_fox_analytics',
         description: 'Get OnChain Hyper Foxes collection analytics and rare trait data',

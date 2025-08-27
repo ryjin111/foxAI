@@ -6,7 +6,7 @@ import { dripTradeClient } from './drip-trade-client';
 
 export interface ScheduledTask {
   id: string;
-  type: 'gm_tweet' | 'floor_update' | 'trait_alert' | 'community_engagement';
+  type: 'gm_tweet' | 'community_engagement';
   schedule: string; // cron expression
   lastRun: string | null;
   nextRun: string;
@@ -44,29 +44,9 @@ export class AIScheduler {
       priority: 'high'
     });
 
-    // Floor update task
-    this.addTask({
-      id: 'weekly_floor_update',
-      type: 'floor_update',
-      schedule: '0 10 * * 1', // 10 AM every Monday
-      lastRun: null,
-      nextRun: this.calculateNextRun('0 10 * * 1'),
-      enabled: true,
-      description: 'Post weekly OnChain Hyper Foxes floor update',
-      priority: 'medium'
-    });
 
-    // Trait alert task
-    this.addTask({
-      id: 'daily_trait_alert',
-      type: 'trait_alert',
-      schedule: '0 14 * * *', // 2 PM daily
-      lastRun: null,
-      nextRun: this.calculateNextRun('0 14 * * *'),
-      enabled: true,
-      description: 'Post daily rare trait alerts',
-      priority: 'medium'
-    });
+
+
 
     // Community engagement task
     this.addTask({
@@ -150,12 +130,6 @@ export class AIScheduler {
         case 'gm_tweet':
           await this.executeGmTweet();
           break;
-              case 'floor_update':
-        await this.executeFloorUpdate();
-          break;
-                  case 'trait_alert':
-            await this.executeTraitAlert();
-          break;
         case 'community_engagement':
           await this.executeCommunityEngagement();
           break;
@@ -188,11 +162,11 @@ export class AIScheduler {
 
     // GM tweet templates (dynamic, no static prices)
     const templates = [
-      "🦊 GM Fox Fam! Rare traits moving, alpha hunters stay ready. Check Drip.Trade for current floors",
-      "🦊 GM Hyperliquid! OnChain Hyper Foxes leading the ecosystem. Chads accumulating while normies sleep",
-      "🦊 GM Fox Holders! Effects and Ki traits where the alpha is. Time to hunt on the fastest L1",
-      "🦊 GM! Another day, another fox W. Paper hands fold, diamond hands accumulate rare traits",
-      "🦊 GM Hyperliquid EVM! Fox community built different. Smart money knows where to look"
+      "🦊 GM Fox Fam! OnChain Hyper Foxes building on @hyperliquidX - the fastest L1 in crypto 🚀",
+      "🦊 GM @hyperliquidX! OnChain Hyper Foxes leading the ecosystem. Chads accumulating while normies sleep 💎",
+      "🦊 GM Fox Holders! Building strong on @hyperliquidX - where real alpha lives 🔥",
+      "🦊 GM! Another day, another fox W on @hyperliquidX. Paper hands fold, diamond hands accumulate 📈",
+      "🦊 GM @hyperliquidX EVM! Fox community built different. Smart money knows where the future is 🌟"
     ];
 
     const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
@@ -210,21 +184,9 @@ export class AIScheduler {
     }
   }
 
-  private async executeFloorUpdate(): Promise<void> {
-    // Generate dynamic fox floor update content (no static prices)
-    const content = dripTradeClient.getDynamicTweetContent('floor');
-    
-    const twitterClient = new FoxyTwitterClient();
-    await twitterClient.postTweet(content);
-  }
 
-  private async executeTraitAlert(): Promise<void> {
-    // Generate dynamic rare trait alert content
-    const content = dripTradeClient.getDynamicTweetContent('traits');
-    
-    const twitterClient = new FoxyTwitterClient();
-    await twitterClient.postTweet(content);
-  }
+
+
 
   private async executeCommunityEngagement(): Promise<void> {
     const twitterClient = new FoxyTwitterClient();

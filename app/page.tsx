@@ -183,9 +183,9 @@ export default function OnChainHyperFoxesAgent() {
       color: 'from-yellow-500 to-orange-600',
     },
     {
-              title: 'Post Fox Floor Tweet',
-        description: 'Post a tweet about fox floor and rare traits',
-        action: 'Post a tweet about OnChain Hyper Foxes floor price and rare traits',
+                          title: 'Post Fox Tweet',
+            description: 'Post a tweet about OnChain Hyper Foxes',
+            action: 'Post a tweet about OnChain Hyper Foxes community and ecosystem',
       icon: TrendingUp,
       color: 'from-green-500 to-emerald-600',
     },
@@ -255,7 +255,7 @@ export default function OnChainHyperFoxesAgent() {
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'assistant',
-                      content: `🤖 **AI Scheduler Started!**\n\n✅ Automated tasks are now running:\n\n• Daily GM tweets at 9 AM\n• Weekly fox floor updates on Mondays\n• Daily rare trait alerts at 2 PM\n• Community engagement every 4 hours\n\nFoxy will now handle all your daily posting automatically! 🚀`,
+                      content: `🤖 **AI Scheduler Started!**\n\n✅ Automated tasks are now running:\n\n• Daily GM tweets at 9 AM\n• Community engagement every 4 hours\n\nFoxy will now handle all your daily posting automatically! 🚀`,
           timestamp: new Date(),
         }]);
       } else {

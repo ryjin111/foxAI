@@ -5,11 +5,11 @@ import { shinZDB } from '@/lib/database';
 
 // GM tweet templates with variations (dynamic, no static prices)
 const GM_TWEET_TEMPLATES = [
-  "🦊 GM Fox Fam! Rare traits moving, alpha hunters stay ready. Check Drip.Trade for current floors",
-  "🦊 GM Hyperliquid! OnChain Hyper Foxes leading the ecosystem. Chads accumulating while normies sleep",
-  "🦊 GM Fox Holders! Effects and Ki traits where the alpha is. Time to hunt on the fastest L1",
-  "🦊 GM! Another day, another fox W. Paper hands fold, diamond hands accumulate rare traits",
-  "🦊 GM Hyperliquid EVM! Fox community built different. Smart money knows where to look"
+  "🦊 GM Fox Fam! OnChain Hyper Foxes building on @hyperliquidX - the fastest L1 in crypto 🚀",
+  "🦊 GM @hyperliquidX! OnChain Hyper Foxes leading the ecosystem. Chads accumulating while normies sleep 💎",
+  "🦊 GM Fox Holders! Building strong on @hyperliquidX - where real alpha lives 🔥",
+  "🦊 GM! Another day, another fox W on @hyperliquidX. Paper hands fold, diamond hands accumulate 📈",
+  "🦊 GM @hyperliquidX EVM! Fox community built different. Smart money knows where the future is 🌟"
 ];
 
 export async function GET(req: NextRequest) {
