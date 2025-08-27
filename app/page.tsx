@@ -4,7 +4,7 @@ import { Send, Twitter, TrendingUp, MessageCircle, BarChart3, Copy, Check, Bot, 
 import { useState, useRef, useEffect } from 'react';
 import PersonalityDisplay from '@/components/PersonalityDisplay';
 import LearningDashboard from '@/components/LearningDashboard';
-import { accessCodeManager } from '@/lib/access-codes';
+import { accessCodeManager } from '@/lib/access-codes-override';
 
 interface Message {
   id: string;
@@ -19,9 +19,7 @@ export default function OnChainHyperFoxesAgent() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('chat');
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-  const [showAccessModal, setShowAccessModal] = useState(false); // Don't show immediately
-  const [accessCode, setAccessCode] = useState('');
-  const [accessError, setAccessError] = useState('');
+  // Access code system removed - Foxy is now open access
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -185,16 +183,16 @@ export default function OnChainHyperFoxesAgent() {
       color: 'from-yellow-500 to-orange-600',
     },
     {
-      title: 'Post Gasback Tweet',
-      description: 'Post a tweet about Gasback rewards',
-              action: 'Post a tweet about OnChain Hyper Foxes floor price and rare traits',
+              title: 'Post Fox Floor Tweet',
+        description: 'Post a tweet about fox floor and rare traits',
+        action: 'Post a tweet about OnChain Hyper Foxes floor price and rare traits',
       icon: TrendingUp,
       color: 'from-green-500 to-emerald-600',
     },
     {
-      title: 'Post NFT Update',
-      description: 'Post about trending NFT collections',
-              action: 'Post a tweet about Hyperliquid EVM ecosystem developments',
+              title: 'Post Rare Trait Alert',
+        description: 'Post about rare fox traits and alpha',
+        action: 'Post a tweet about Hyperliquid EVM ecosystem developments',
       icon: BarChart3,
       color: 'from-purple-500 to-indigo-600',
     },
@@ -321,27 +319,7 @@ export default function OnChainHyperFoxesAgent() {
     }
   };
 
-  const handleAccessCodeSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setAccessError('');
-    
-    if (accessCodeManager.setAccessCode(accessCode)) {
-      setShowAccessModal(false);
-      setAccessCode('');
-      // Add success message to chat
-      const currentAccess = accessCodeManager.getCurrentAccessCode();
-      if (currentAccess) {
-        setMessages(prev => [...prev, {
-          id: Date.now().toString(),
-          role: 'assistant',
-          content: `🔓 **Access Granted!**\n\n${currentAccess.description}\n\nYou now have access to OnChainHyperFoxes Agent features!`,
-          timestamp: new Date(),
-        }]);
-      }
-    } else {
-      setAccessError('Invalid access code. Please try again.');
-    }
-  };
+  // Access code system removed - no authentication needed
 
   const getAccessStatus = () => {
     const currentAccess = accessCodeManager.getCurrentAccessCode();
@@ -418,7 +396,7 @@ export default function OnChainHyperFoxesAgent() {
               <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg flex items-center justify-center">
                 <Twitter className="w-4 h-4 text-white" />
               </div>
-              <h1 className="text-lg font-bold text-gray-900">OnChainHyperFoxes Agent</h1>
+              <h1 className="text-lg font-bold text-gray-900">Foxy AI Agent</h1>
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-// Database system for ShinZ AI learning and memory
+// Database system for Foxy AI learning and memory
 import { createClient } from '@supabase/supabase-js';
 
 export interface NFTCollection {
@@ -107,7 +107,7 @@ export interface GmTweet {
   error?: string;
 }
 
-class ShinZDatabase {
+class FoxyDatabase {
   private supabase: any;
   private isLocal: boolean;
   private localData!: {
@@ -488,4 +488,6 @@ class ShinZDatabase {
   }
 }
 
-export const shinZDB = new ShinZDatabase(); 
+export const foxyDB = new FoxyDatabase();
+// Backward compatibility
+export const shinZDB = foxyDB; 
