@@ -1,7 +1,7 @@
 {
-  "name": "onchainhyperfoxes-ai-agent",
-  "version": "1.0.0",
-  "description": "AI Agent for OnChainHyperFoxes NFT collection and Hyperliquid EVM ecosystem management",
+  "name": "foxy-ai-agent",
+  "version": "2.0.0",
+  "description": "Foxy - AIXBT-style shitposting OnChain Hyper Foxes alpha hunter on Hyperliquid EVM, powered by ElizaOS",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,6 +10,9 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@elizaos/core": "^1.0.0",
+    "@elizaos/plugin-twitter": "^1.0.0",
+    "@elizaos/plugin-coingecko": "^1.0.0",
     "@supabase/supabase-js": "^2.53.0",
     "@tailwindcss/typography": "^0.5.16",
     "@wagmi/core": "^2.0.0",
