@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/cron/community-engagement",
-      "schedule": "0 */4 * * *"
+      "schedule": "*/5 * * * *"
     }
   ]
 } 
