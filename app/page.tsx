@@ -255,7 +255,7 @@ export default function OnChainHyperFoxesAgent() {
         setMessages(prev => [...prev, {
           id: Date.now().toString(),
           role: 'assistant',
-          content: `🤖 **AI Scheduler Started!**\n\n✅ Automated tasks are now running:\n\n• Daily GM tweets at 9 AM\n• Weekly Gasback updates on Mondays\n• Daily NFT collection updates at 2 PM\n• Community engagement every 4 hours\n\nThe AI will now handle all your daily posting automatically! 🚀`,
+                      content: `🤖 **AI Scheduler Started!**\n\n✅ Automated tasks are now running:\n\n• Daily GM tweets at 9 AM\n• Weekly fox floor updates on Mondays\n• Daily rare trait alerts at 2 PM\n• Community engagement every 4 hours\n\nFoxy will now handle all your daily posting automatically! 🚀`,
           timestamp: new Date(),
         }]);
       } else {
@@ -608,52 +608,6 @@ export default function OnChainHyperFoxesAgent() {
           )}
         </div>
       </div>
-
-      {/* Access Code Modal */}
-      {showAccessModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
-            <div className="flex items-center gap-3 mb-4">
-              <Key className="w-6 h-6 text-blue-600" />
-              <h2 className="text-xl font-semibold text-gray-900">Access Required</h2>
-            </div>
-            
-            <form onSubmit={handleAccessCodeSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Access Code
-                </label>
-                <input
-                  type="text"
-                  value={accessCode}
-                  onChange={(e) => setAccessCode(e.target.value)}
-                  placeholder="Enter access code..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 bg-white"
-                  autoFocus
-                />
-              </div>
-              
-              {accessError && (
-                <div className="text-red-600 text-sm">{accessError}</div>
-              )}
-              
-              <div className="text-xs text-gray-900 space-y-1">
-                <div><strong>Contact me @clintmod111 for access codes.</strong></div>
-              </div>
-              
-              <div className="flex gap-3">
-                <button
-                  type="submit"
-                  className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                  Enter Code
-                </button>
-               
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

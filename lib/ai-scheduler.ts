@@ -1,12 +1,12 @@
 // AI-Powered Scheduler for Foxy Agent
 import { shinZDB } from './database';
 import { FoxyTwitterClient, MentionsResult } from './twitter';
-import { accessCodeManager } from './access-codes';
+import { accessCodeManager } from './access-codes-override';
 import { dripTradeClient } from './drip-trade-client';
 
 export interface ScheduledTask {
   id: string;
-  type: 'gm_tweet' | 'gasback_update' | 'nft_update' | 'community_engagement';
+  type: 'gm_tweet' | 'floor_update' | 'trait_alert' | 'community_engagement';
   schedule: string; // cron expression
   lastRun: string | null;
   nextRun: string;
@@ -40,31 +40,31 @@ export class AIScheduler {
       lastRun: null,
       nextRun: this.calculateNextRun('0 9 * * *'),
       enabled: true,
-      description: 'Post daily GM tweet to @ShapeL2 Shapers with seishinz.xyz',
+      description: 'Post daily GM tweet to fox community on Hyperliquid',
       priority: 'high'
     });
 
-    // Gasback update task
+    // Floor update task
     this.addTask({
-      id: 'weekly_gasback_update',
-      type: 'gasback_update',
+      id: 'weekly_floor_update',
+      type: 'floor_update',
       schedule: '0 10 * * 1', // 10 AM every Monday
       lastRun: null,
       nextRun: this.calculateNextRun('0 10 * * 1'),
       enabled: true,
-      description: 'Post weekly Gasback rewards update',
+      description: 'Post weekly OnChain Hyper Foxes floor update',
       priority: 'medium'
     });
 
-    // NFT collection update task
+    // Trait alert task
     this.addTask({
-      id: 'daily_nft_update',
-      type: 'nft_update',
+      id: 'daily_trait_alert',
+      type: 'trait_alert',
       schedule: '0 14 * * *', // 2 PM daily
       lastRun: null,
       nextRun: this.calculateNextRun('0 14 * * *'),
       enabled: true,
-      description: 'Post daily NFT collection analytics',
+      description: 'Post daily rare trait alerts',
       priority: 'medium'
     });
 
@@ -150,11 +150,11 @@ export class AIScheduler {
         case 'gm_tweet':
           await this.executeGmTweet();
           break;
-        case 'gasback_update':
-          await this.executeGasbackUpdate();
+              case 'floor_update':
+        await this.executeFloorUpdate();
           break;
-        case 'nft_update':
-          await this.executeNftUpdate();
+                  case 'trait_alert':
+            await this.executeTraitAlert();
           break;
         case 'community_engagement':
           await this.executeCommunityEngagement();
@@ -210,7 +210,7 @@ export class AIScheduler {
     }
   }
 
-  private async executeGasbackUpdate(): Promise<void> {
+  private async executeFloorUpdate(): Promise<void> {
     // Generate dynamic fox floor update content (no static prices)
     const content = dripTradeClient.getDynamicTweetContent('floor');
     
@@ -218,7 +218,7 @@ export class AIScheduler {
     await twitterClient.postTweet(content);
   }
 
-  private async executeNftUpdate(): Promise<void> {
+  private async executeTraitAlert(): Promise<void> {
     // Generate dynamic rare trait alert content
     const content = dripTradeClient.getDynamicTweetContent('traits');
     

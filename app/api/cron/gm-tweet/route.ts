@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { FoxyTwitterClient } from '@/lib/twitter';
-import { accessCodeManager } from '@/lib/access-codes';
+import { accessCodeManager } from '@/lib/access-codes-override';
 import { shinZDB } from '@/lib/database';
 
 // GM tweet templates with variations (dynamic, no static prices)

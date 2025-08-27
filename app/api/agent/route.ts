@@ -6,7 +6,7 @@ import { HyperliquidClient } from '@/lib/hyperliquid';
 import { CoinGeckoMCPClient } from '@/lib/coingecko-mcp';
 import { enhancedLearning } from '@/lib/enhanced-learning';
 import { shinZDB } from '@/lib/database';
-import { accessCodeManager } from '@/lib/access-codes';
+import { accessCodeManager } from '@/lib/access-codes-override';
 
 export const maxDuration = 30;
 
@@ -443,8 +443,8 @@ export async function POST(req: NextRequest) {
                     replyContent = `Mint season is here! 🎨 Good luck with your mints! 💎`;
                   } else if (mentionText.includes('nft') || mentionText.includes('collection')) {
                     replyContent = `NFTs are the future! 🚀 Keep building that collection! 💪`;
-                  } else if (mentionText.includes('gasback') || mentionText.includes('rewards')) {
-                    replyContent = `Gasback rewards are stacking up! 💰 Keep earning! 📈`;
+                                  } else if (mentionText.includes('floor') || mentionText.includes('price')) {
+                  replyContent = `🦊 Floor moving! Chad holders accumulating rare traits while paper hands dump. Check Drip.Trade for current alpha! 📈`;
                   } else if (mentionText.includes('?') || mentionText.includes('question')) {
                     replyContent = `Great question! 🤔 Let me know if you need more details! 💡`;
                   } else {
@@ -459,7 +459,7 @@ export async function POST(req: NextRequest) {
                   
                   const replyResult = await twitterClient.replyToTweet(mention.id, replyContent);
                   if (replyResult.success) {
-                    toolResults += `\n✅ **Replied to @${mention.author_id}**: "${replyContent}"\n   [View Reply](https://x.com/seishinzinshape/status/${replyResult.tweetId})`;
+                    toolResults += `\n✅ **Replied to @${mention.author_id}**: "${replyContent}"\n   [View Reply](https://x.com/onchainhyperfox/status/${replyResult.tweetId})`;
                   } else {
                     toolResults += `\n❌ **Failed to reply to @${mention.author_id}**: ${replyResult.error}`;
                   }
@@ -528,7 +528,7 @@ export async function POST(req: NextRequest) {
                 
                 const replyResult = await twitterClient.replyToTweet(tweetIdToReplyTo, replyContent);
                 if (replyResult.success) {
-                  toolResults += `\n\n✅ **Posted:** [View on X](https://twitter.com/seishinzinshape/status/${replyResult.tweetId})`;
+                  toolResults += `\n\n✅ **Posted:** [View on X](https://twitter.com/onchainhyperfox/status/${replyResult.tweetId})`;
                 } else {
                   toolResults += `\n\n❌ **Failed to reply:** ${replyResult.error}`;
                   console.error('Reply failed:', replyResult.details);
