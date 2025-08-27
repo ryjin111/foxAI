@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { SeishinZTwitterClient } from '@/lib/twitter';
+import { FoxyTwitterClient } from '@/lib/twitter';
 import { PersonalityEngine, FOX_PERSONALITY } from '@/lib/ai-personality';
 import { DeepSeekClient } from '@/lib/deepseek-client';
 import { HyperliquidClient } from '@/lib/hyperliquid';
@@ -118,7 +118,7 @@ export async function GET(req: NextRequest) {
   }
   
   return new Response(JSON.stringify({ 
-    message: "SeishinZ AI Agent API", 
+          message: "Foxy AI Agent API", 
     status: "running",
     endpoints: {
       chat: "POST /api/agent"
@@ -159,7 +159,7 @@ export async function POST(req: NextRequest) {
     }
 
       // Initialize clients
-  const twitterClient = new SeishinZTwitterClient();
+  const twitterClient = new FoxyTwitterClient();
   const hyperliquidClient = new HyperliquidClient();
   const coinGeckoClient = new CoinGeckoMCPClient();
   const personalityEngine = new PersonalityEngine(FOX_PERSONALITY);
@@ -177,7 +177,7 @@ export async function POST(req: NextRequest) {
     const xTools = [
       {
         name: 'post_tweet',
-        description: 'Post a tweet to the SeishinZ X account',
+        description: 'Post a tweet to the OnChain Hyper Foxes X account',
         inputSchema: {
           type: 'object',
           properties: {
@@ -209,7 +209,7 @@ export async function POST(req: NextRequest) {
       },
       {
         name: 'get_mentions',
-        description: 'Get recent mentions of the SeishinZ account'
+        description: 'Get recent mentions of the OnChain Hyper Foxes account'
       },
       {
         name: 'get_trending_topics',
@@ -235,11 +235,11 @@ export async function POST(req: NextRequest) {
       }
     ];
 
-    // Create Shape Network tools
-    const shapeTools = [
+    // Create Hyperliquid EVM tools
+    const hyperliquidTools = [
       {
-        name: 'get_gasback_data',
-        description: 'Get Gasback rewards data from Shape Network',
+        name: 'get_fox_floor_price',
+        description: 'Get OnChain Hyper Foxes floor price and collection stats from Drip.Trade',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -247,8 +247,8 @@ export async function POST(req: NextRequest) {
         }
       },
       {
-        name: 'get_nft_analytics',
-        description: 'Get NFT collection analytics from Shape Network',
+        name: 'get_fox_analytics',
+        description: 'Get OnChain Hyper Foxes collection analytics and rare trait data',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -256,8 +256,8 @@ export async function POST(req: NextRequest) {
         }
       },
       {
-        name: 'get_stack_achievements',
-        description: 'Get Stack achievements and leaderboard data',
+        name: 'get_hyperliquid_ecosystem',
+        description: 'Get Hyperliquid EVM ecosystem data and new protocols',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -265,8 +265,8 @@ export async function POST(req: NextRequest) {
         }
       },
       {
-        name: 'get_chain_status',
-        description: 'Get Shape Network chain status and metrics',
+        name: 'get_hyperliquid_status',
+        description: 'Get Hyperliquid chain status and performance metrics',
         inputSchema: {
           type: 'object',
           properties: {},
@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
     ];
 
     // Combine all tools
-    const allTools = [...xTools, ...shapeTools];
+    const allTools = [...xTools, ...hyperliquidTools];
 
     // Get recent context for learning
     const recentInteractions = await shinZDB.getRecentInteractions(3);
@@ -388,7 +388,7 @@ export async function POST(req: NextRequest) {
                 
                 const tweetResult = await twitterClient.postTweet(tweetContent);
                 if (tweetResult.success) {
-                  toolResults += `\n\n✅ **Tweet Posted Successfully!**\nTweet ID: ${tweetResult.tweetId}\nView: https://x.com/seishinzinshape/status/${tweetResult.tweetId}`;
+                  toolResults += `\n\n✅ **Tweet Posted Successfully!**\nTweet ID: ${tweetResult.tweetId}\nView: https://x.com/onchainhyperfox/status/${tweetResult.tweetId}`;
                 } else {
                   toolResults += `\n\n❌ **Failed to post tweet:** ${tweetResult.error}`;
                   if (tweetResult.details) {

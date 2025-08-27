@@ -1,4 +1,4 @@
-// Access code system for SeishinZ Agent
+// Access code system for Foxy Agent
 // Different access levels with X posting restrictions
 
 export interface AccessCode {
@@ -254,11 +254,11 @@ export class AccessCodeManager {
     }
     
     if (!this.currentAccessCode) {
-      return '🔒 **Access Required**\n\nPlease enter an access code to use SeishinZ Agent.\n\nContact the administrator for access codes.';
+      return '🔒 **Access Required**\n\nPlease enter an access code to use Foxy Agent.\n\nContact the administrator for access codes.';
     }
 
     if (!this.currentAccessCode.permissions.canPostTweets) {
-      return '🔒 **X Posting Restricted**\n\nYour access code does not allow posting to X. You can still:\n• Use the chat interface\n• Check replies and mentions\n• Get Shape Network data\n• View AI personality and learning\n\nContact the administrator to upgrade your access level.';
+      return '🔒 **X Posting Restricted**\n\nYour access code does not allow posting to X. You can still:\n• Use the chat interface\n• Check replies and mentions\n• Get Hyperliquid EVM data\n• View AI personality and learning\n\nContact the administrator to upgrade your access level.';
     }
 
     return '';

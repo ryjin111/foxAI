@@ -1,13 +1,13 @@
 import { TwitterApi } from 'twitter-api-v2';
 
-// Twitter API client for SeishinZ account
+// Twitter API client for OnChain Hyper Foxes account
 export interface MentionsResult {
   success: boolean;
   mentions?: any[];
   error?: string;
 }
 
-export class SeishinZTwitterClient {
+export class FoxyTwitterClient {
   private client: TwitterApi;
 
   constructor() {

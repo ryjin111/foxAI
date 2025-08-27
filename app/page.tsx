@@ -33,11 +33,8 @@ export default function OnChainHyperFoxesAgent() {
     scrollToBottom();
   }, [messages]);
 
-  // Auto-enable admin bypass and start AI scheduler for development
+  // Start AI scheduler automatically on load
   useEffect(() => {
-    accessCodeManager.enableAdminBypass();
-    console.log('Auto-enabled admin bypass for development');
-    
     // Start AI scheduler automatically
     fetch('/api/ai-scheduler', {
       method: 'POST',
@@ -190,14 +187,14 @@ export default function OnChainHyperFoxesAgent() {
     {
       title: 'Post Gasback Tweet',
       description: 'Post a tweet about Gasback rewards',
-      action: 'Post a tweet about the latest Gasback rewards on Shape Network',
+              action: 'Post a tweet about OnChain Hyper Foxes floor price and rare traits',
       icon: TrendingUp,
       color: 'from-green-500 to-emerald-600',
     },
     {
       title: 'Post NFT Update',
       description: 'Post about trending NFT collections',
-      action: 'Post a tweet about the latest NFT collection analytics from Shape Network',
+              action: 'Post a tweet about Hyperliquid EVM ecosystem developments',
       icon: BarChart3,
       color: 'from-purple-500 to-indigo-600',
     },
@@ -401,27 +398,7 @@ export default function OnChainHyperFoxesAgent() {
           </button>
         )}
         
-        {/* Admin Bypass Toggle */}
-        <div className="pt-2 border-t border-gray-200">
-          <button
-            onClick={() => {
-              if (accessCodeManager.isAdminBypassEnabled()) {
-                accessCodeManager.disableAdminBypass();
-              } else {
-                accessCodeManager.enableAdminBypass();
-              }
-              // Force re-render
-              setMessages(prev => [...prev]);
-            }}
-            className={`w-full text-xs px-2 py-1 rounded transition-colors ${
-              accessCodeManager.isAdminBypassEnabled()
-                ? 'bg-red-100 text-red-700 hover:bg-red-200'
-                : 'bg-green-100 text-green-700 hover:bg-green-200'
-            }`}
-          >
-            {accessCodeManager.isAdminBypassEnabled() ? '🔒 Disable Admin' : '🔓 Enable Admin'}
-          </button>
-        </div>
+
       </div>
     );
   };
@@ -518,7 +495,7 @@ export default function OnChainHyperFoxesAgent() {
                         Welcome to OnChainHyperFoxes Agent
                       </h2>
                       <p className="text-gray-600 max-w-md">
-                        Your NFT-focused AI assistant. Ask me to post tweets, check mentions, or get Shape Network data.
+                        Your OnChain Hyper Foxes alpha hunter. Ask me to post tweets, check mentions, or get Hyperliquid EVM data.
                       </p>
                     </div>
                   </div>
