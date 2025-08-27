@@ -19,7 +19,7 @@ export default function OnChainHyperFoxesAgent() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('chat');
   const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null);
-  // Access code system removed - Foxy is now open access
+  // No access restrictions - Foxy is always ready
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -220,12 +220,7 @@ export default function OnChainHyperFoxesAgent() {
   ];
 
   const handleQuickAction = (action: string) => {
-    // Check if user has permission to use quick actions
-    if (!accessCodeManager.canPerformAction('useQuickActions')) {
-      // Auto-enable admin bypass for development
-      accessCodeManager.enableAdminBypass();
-      console.log('Auto-enabled admin bypass for quick action');
-    }
+    // Foxy has full access - no restrictions
     
     // Special handling for AI Scheduler
     if (action.includes('AI scheduler')) {
