@@ -5,6 +5,7 @@ export const accessCodeManager = {
   getCurrentAccessCode: () => ({
     code: 'FOXY_ACTIVE',
     level: 'premium' as const,
+    type: 'permanent' as const,
     description: 'Foxy AI Agent - Full Access',
     permissions: {
       canPostTweets: true,
@@ -21,9 +22,13 @@ export const accessCodeManager = {
   getUsageStats: () => ({
     tweetsToday: 0,
     repliesToday: 0,
-    lastActivity: new Date()
+    lastActivity: new Date(),
+    accessCode: 'FOXY_ACTIVE',
+    tweetsPosted: 0,
+    remainingTweets: 999,
+    repliesSent: 0
   }),
-  canPerformAction: () => ({ allowed: true, message: 'Foxy is ready!' }),
-  recordAction: () => {},
+  canPerformAction: (action?: string) => ({ allowed: true, message: 'Foxy is ready!' }),
+  recordAction: (action?: string) => {},
   getAccessStatus: () => 'Foxy AI Agent - Full Access'
 }; 
