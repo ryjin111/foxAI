@@ -116,11 +116,20 @@ export class FoxyTwitterClient {
     }
   }
 
-  // Get mentions
+  // Get mentions - only replies that specifically mention @onchainhyperfoxes
   async getMentions(): Promise<MentionsResult> {
     try {
       const mentions = await this.client.v2.userMentionTimeline(process.env.TWITTER_USER_ID!);
-      return { success: true, mentions: mentions.data?.data || [] };
+      const allMentions = mentions.data?.data || [];
+      
+      // Filter to only include tweets that explicitly mention @onchainhyperfoxes
+      const filteredMentions = allMentions.filter((mention: any) => 
+        mention.text.toLowerCase().includes('@onchainhyperfoxes') ||
+        mention.text.toLowerCase().includes('onchainhyperfoxes')
+      );
+      
+      console.log(`Found ${allMentions.length} total mentions, ${filteredMentions.length} actual @onchainhyperfoxes mentions`);
+      return { success: true, mentions: filteredMentions };
     } catch (error) {
       console.error('Error getting mentions:', error);
       return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
