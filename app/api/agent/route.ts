@@ -305,19 +305,33 @@ export async function POST(req: NextRequest) {
             let additionalData = '';
             let toolResults = '';
             
-            // Check for Twitter posting requests
-            if (currentUserMessage.includes('post') && currentUserMessage.includes('tweet')) {
+            // Check for Twitter posting requests - more flexible matching
+            const isPostingRequest = currentUserMessage.includes('post') && currentUserMessage.includes('tweet') ||
+                                   currentUserMessage.includes('tweet') ||
+                                   currentUserMessage.includes('make a tweet') ||
+                                   currentUserMessage.includes('send a tweet') ||
+                                   currentUserMessage.includes('create a tweet') ||
+                                   currentUserMessage.includes('write a tweet') ||
+                                   (currentUserMessage.includes('post') && (currentUserMessage.includes('twitter') || currentUserMessage.includes('x.com')));
+            
+            if (isPostingRequest) {
               // Check if user has permission to post tweets
+              console.log('🐦 TWEET POSTING REQUEST DETECTED');
+              console.log('User message:', currentUserMessage);
               console.log('Checking postTweet permission...');
               console.log('Current access code:', accessCodeManager.getCurrentAccessCode());
               console.log('Can perform action:', accessCodeManager.canPerformAction('postTweet'));
               
               if (!accessCodeManager.canPerformAction('postTweet')) {
                 const restrictionMessage = accessCodeManager.getRestrictionMessage();
+                console.log('❌ Permission denied:', restrictionMessage);
                 toolResults += `\n\n${restrictionMessage}`;
               } else {
+                console.log('✅ Permission granted, proceeding with tweet posting...');
                 // Extract the tweet content from the AI response
               let tweetContent = response.content;
+              console.log('Original AI response:', response.content);
+              console.log('Initial tweet content:', tweetContent);
               
               // Try to extract just the tweet content by looking for patterns
               // Remove common prefixes and explanations
@@ -376,15 +390,22 @@ export async function POST(req: NextRequest) {
                 // Remove surrounding quotes if they exist
                 tweetContent = tweetContent.replace(/^["']|["']$/g, '');
                 
-                console.log('Posting tweet:', tweetContent);
+                console.log('Final processed tweet content:', tweetContent);
+                console.log('Tweet content length:', tweetContent.length);
                 
-                const tweetResult = await twitterClient.postTweet(tweetContent);
-                if (tweetResult.success) {
-                  toolResults += `\n\n✅ **Tweet Posted Successfully!**\nTweet ID: ${tweetResult.tweetId}\nView: https://x.com/onchainhyperfox/status/${tweetResult.tweetId}`;
+                if (tweetContent.length === 0) {
+                  console.log('❌ Tweet content is empty after processing!');
+                  toolResults += `\n\n❌ **Failed to extract tweet content** - Content was empty after processing`;
                 } else {
-                  toolResults += `\n\n❌ **Failed to post tweet:** ${tweetResult.error}`;
-                  if (tweetResult.details) {
-                    toolResults += `\n\n**Error Details:** ${JSON.stringify(tweetResult.details, null, 2)}`;
+                  console.log('📤 Posting tweet to Twitter...');
+                  const tweetResult = await twitterClient.postTweet(tweetContent);
+                  if (tweetResult.success) {
+                    toolResults += `\n\n✅ **Tweet Posted Successfully!**\nTweet ID: ${tweetResult.tweetId}\nView: https://x.com/onchainhyperfox/status/${tweetResult.tweetId}`;
+                  } else {
+                    toolResults += `\n\n❌ **Failed to post tweet:** ${tweetResult.error}`;
+                    if (tweetResult.details) {
+                      toolResults += `\n\n**Error Details:** ${JSON.stringify(tweetResult.details, null, 2)}`;
+                    }
                   }
                 }
               }
