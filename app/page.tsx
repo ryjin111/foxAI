@@ -377,17 +377,6 @@ export default function OnChainHyperFoxesAgent() {
               Chat
             </button>
             <button
-              onClick={() => setActiveTab('quick')}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                activeTab === 'quick'
-                  ? 'bg-blue-50 text-blue-600'
-                  : 'text-gray-600 hover:bg-gray-100'
-              }`}
-            >
-              <Zap className="w-4 h-4" />
-              Quick Actions
-            </button>
-            <button
               onClick={() => setActiveTab('personality')}
               className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 activeTab === 'personality'
@@ -420,170 +409,191 @@ export default function OnChainHyperFoxesAgent() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col">
           {activeTab === 'chat' ? (
-            /* Chat Interface */
-            <>
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto bg-white">
-                {messages.length === 0 ? (
-                  <div className="flex items-center justify-center h-full">
-                    <div className="text-center">
-                      <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Twitter className="w-8 h-8 text-white" />
+            /* Chat Interface with Quick Actions */
+            <div className="flex-1 flex">
+              {/* Left Quick Actions */}
+              <div className="w-64 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto">
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">Quick Actions</h3>
+                </div>
+                <div className="space-y-3">
+                  {quickActions.slice(0, Math.ceil(quickActions.length / 2)).map((action, index) => (
+                    <div
+                      key={index}
+                      className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer group"
+                      onClick={() => handleQuickAction(action.action)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className={`w-8 h-8 bg-gradient-to-r ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <action.icon className="w-4 h-4 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 text-sm mb-1 leading-tight">{action.title}</h4>
+                          <p className="text-xs text-gray-600 leading-tight">{action.description}</p>
+                        </div>
                       </div>
-                      <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                        Welcome to OnChainHyperFoxes Agent
-                      </h2>
-                      <p className="text-gray-600 max-w-md">
-                        Your OnChain Hyper Foxes alpha hunter. Ask me to post tweets, check mentions, or get Hyperliquid EVM data.
-                      </p>
                     </div>
-                  </div>
-                ) : (
-                  <div className="max-w-4xl mx-auto">
-                                         {messages.map((message) => (
-                       <div
-                         key={message.id}
-                         className={`py-6 border-b border-gray-100 ${
-                           message.role === 'assistant' ? 'bg-gray-50' : ''
-                         }`}
-                       >
-                         <div className="max-w-3xl mx-auto px-4">
-                           <div className="flex gap-4">
-                             <div className="flex-shrink-0">
-                               {message.role === 'user' ? (
-                                 <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
-                                   <User className="w-4 h-4 text-white" />
+                  ))}
+                </div>
+              </div>
+
+              {/* Chat Messages Area */}
+              <div className="flex-1 flex flex-col">
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto bg-white">
+                  {messages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Twitter className="w-8 h-8 text-white" />
+                        </div>
+                        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                          Welcome to OnChainHyperFoxes Agent
+                        </h2>
+                        <p className="text-gray-600 max-w-md">
+                          Your OnChain Hyper Foxes alpha hunter. Ask me to post tweets, check mentions, or get Hyperliquid EVM data.
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="max-w-4xl mx-auto">
+                      {messages.map((message) => (
+                         <div
+                           key={message.id}
+                           className={`py-6 border-b border-gray-100 ${
+                             message.role === 'assistant' ? 'bg-gray-50' : ''
+                           }`}
+                         >
+                           <div className="max-w-3xl mx-auto px-4">
+                             <div className="flex gap-4">
+                               <div className="flex-shrink-0">
+                                 {message.role === 'user' ? (
+                                   <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                                     <User className="w-4 h-4 text-white" />
+                                   </div>
+                                 ) : (
+                                   <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
+                                     <Bot className="w-4 h-4 text-white" />
+                                   </div>
+                                 )}
+                               </div>
+                               <div className="flex-1 min-w-0">
+                                 <div className="flex items-center gap-2 mb-2">
+                                   <span className="font-medium text-gray-900">
+                                     {message.role === 'user' ? 'You' : 'OnChainHyperFoxes Agent'}
+                                   </span>
+                                   <span className="text-xs text-gray-500">
+                                     {formatTime(message.timestamp)}
+                                   </span>
+                                   {message.role === 'assistant' && (
+                                     <button
+                                       onClick={() => copyMessage(message.content, message.id)}
+                                       className="ml-auto p-1 text-gray-400 hover:text-gray-600 transition-colors"
+                                     >
+                                       {copiedMessageId === message.id ? (
+                                         <Check className="w-4 h-4 text-green-500" />
+                                       ) : (
+                                         <Copy className="w-4 h-4" />
+                                       )}
+                                     </button>
+                                   )}
                                  </div>
-                               ) : (
+                                 <div className="prose prose-sm max-w-none">
+                                   <div className="whitespace-pre-wrap text-gray-900">
+                                     {message.content}
+                                   </div>
+                                 </div>
+                               </div>
+                             </div>
+                           </div>
+                         </div>
+                       ))}
+                       {isLoading && (
+                         <div className="py-6 border-b border-gray-100 bg-gray-50">
+                           <div className="max-w-3xl mx-auto px-4">
+                             <div className="flex gap-4">
+                               <div className="flex-shrink-0">
                                  <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
                                    <Bot className="w-4 h-4 text-white" />
                                  </div>
-                               )}
-                             </div>
-                             <div className="flex-1 min-w-0">
-                               <div className="flex items-center gap-2 mb-2">
-                                 <span className="font-medium text-gray-900">
-                                   {message.role === 'user' ? 'You' : 'OnChainHyperFoxes Agent'}
-                                 </span>
-                                 <span className="text-xs text-gray-500">
-                                   {formatTime(message.timestamp)}
-                                 </span>
-                                 {message.role === 'assistant' && (
-                                   <button
-                                     onClick={() => copyMessage(message.content, message.id)}
-                                     className="ml-auto p-1 text-gray-400 hover:text-gray-600 transition-colors"
-                                   >
-                                     {copiedMessageId === message.id ? (
-                                       <Check className="w-4 h-4 text-green-500" />
-                                     ) : (
-                                       <Copy className="w-4 h-4" />
-                                     )}
-                                   </button>
-                                 )}
                                </div>
-                               <div className="prose prose-sm max-w-none">
-                                 <div className="whitespace-pre-wrap text-gray-900">
-                                   {message.content}
+                               <div className="flex-1">
+                                 <div className="flex items-center gap-2 mb-2">
+                                   <span className="font-medium text-gray-900">
+                                     OnChainHyperFoxes Agent
+                                   </span>
+                                   <span className="text-xs text-gray-500">
+                                     {formatTime(new Date())}
+                                   </span>
+                                 </div>
+                                 <div className="flex items-center gap-2 text-gray-600">
+                                   <div className="flex space-x-1">
+                                     <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
+                                     <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                                     <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                                   </div>
+                                   <span className="text-sm">Thinking...</span>
                                  </div>
                                </div>
                              </div>
                            </div>
                          </div>
-                       </div>
-                     ))}
-                                         {isLoading && (
-                       <div className="py-6 border-b border-gray-100 bg-gray-50">
-                         <div className="max-w-3xl mx-auto px-4">
-                           <div className="flex gap-4">
-                             <div className="flex-shrink-0">
-                               <div className="w-8 h-8 bg-gradient-to-r from-green-600 to-emerald-600 rounded-full flex items-center justify-center">
-                                 <Bot className="w-4 h-4 text-white" />
-                               </div>
-                             </div>
-                             <div className="flex-1">
-                               <div className="flex items-center gap-2 mb-2">
-                                 <span className="font-medium text-gray-900">
-                                   OnChainHyperFoxes Agent
-                                 </span>
-                                 <span className="text-xs text-gray-500">
-                                   {formatTime(new Date())}
-                                 </span>
-                               </div>
-                               <div className="flex items-center gap-2 text-gray-600">
-                                 <div className="flex space-x-1">
-                                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce"></div>
-                                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                   <div className="w-2 h-2 bg-blue-600 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                                 </div>
-                                 <span className="text-sm">Thinking...</span>
-                               </div>
-                             </div>
-                           </div>
-                         </div>
-                       </div>
-                     )}
-                    <div ref={messagesEndRef} />
+                       )}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Input */}
+                <div className="border-t border-gray-200 bg-white p-4">
+                  <div className="max-w-4xl mx-auto">
+                    <form onSubmit={handleSubmit} className="relative">
+                      <div className="relative">
+                        <textarea
+                          ref={inputRef}
+                          value={input}
+                          onChange={handleInputChange}
+                          onKeyDown={handleKeyDown}
+                          placeholder="Message OnChainHyperFoxes Agent..."
+                          className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white text-gray-900 placeholder-gray-500"
+                          rows={1}
+                          disabled={isLoading}
+                        />
+                        <button
+                          type="submit"
+                          disabled={isLoading || !input.trim()}
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                        >
+                          <Send className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="mt-2 text-xs text-gray-500">
+                        Press Enter to send, Shift+Enter for new line
+                      </div>
+                    </form>
                   </div>
-                )}
+                </div>
               </div>
 
-              {/* Input */}
-              <div className="border-t border-gray-200 bg-white p-4">
-                <div className="max-w-4xl mx-auto">
-                  <form onSubmit={handleSubmit} className="relative">
-                    <div className="relative">
-                      <textarea
-                        ref={inputRef}
-                        value={input}
-                        onChange={handleInputChange}
-                        onKeyDown={handleKeyDown}
-                        placeholder="Message OnChainHyperFoxes Agent..."
-                        className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white text-gray-900 placeholder-gray-500"
-                        rows={1}
-                        disabled={isLoading}
-                      />
-                      <button
-                        type="submit"
-                        disabled={isLoading || !input.trim()}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 p-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
-                      >
-                        <Send className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="mt-2 text-xs text-gray-500">
-                      Press Enter to send, Shift+Enter for new line
-                    </div>
-                  </form>
+              {/* Right Quick Actions */}
+              <div className="w-64 bg-gray-50 border-l border-gray-200 p-4 overflow-y-auto">
+                <div className="mb-4">
+                  <h3 className="text-sm font-semibold text-gray-900 mb-3">More Actions</h3>
                 </div>
-              </div>
-            </>
-          ) : activeTab === 'quick' ? (
-            /* Quick Actions */
-            <div className="flex-1 overflow-y-auto bg-gray-50 p-6">
-              <div className="max-w-4xl mx-auto">
-                <div className="mb-6">
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">Quick Actions</h1>
-                  <p className="text-gray-600">
-                    Execute common tasks with one click
-                  </p>
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {quickActions.map((action, index) => (
+                <div className="space-y-3">
+                  {quickActions.slice(Math.ceil(quickActions.length / 2)).map((action, index) => (
                     <div
-                      key={index}
-                      className="bg-white rounded-xl p-6 border border-gray-200 hover:shadow-lg transition-all duration-200 cursor-pointer group"
+                      key={index + Math.ceil(quickActions.length / 2)}
+                      className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-all duration-200 cursor-pointer group"
                       onClick={() => handleQuickAction(action.action)}
                     >
-                      <div className="flex items-start gap-4">
-                        <div className={`w-12 h-12 bg-gradient-to-r ${action.color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                          <action.icon className="w-6 h-6 text-white" />
+                      <div className="flex items-start gap-3">
+                        <div className={`w-8 h-8 bg-gradient-to-r ${action.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                          <action.icon className="w-4 h-4 text-white" />
                         </div>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-2">{action.title}</h3>
-                          <p className="text-sm text-gray-600 mb-4">{action.description}</p>
-                          <div className="text-xs text-blue-600 font-medium">
-                            Click to execute →
-                          </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-gray-900 text-sm mb-1 leading-tight">{action.title}</h4>
+                          <p className="text-xs text-gray-600 leading-tight">{action.description}</p>
                         </div>
                       </div>
                     </div>
